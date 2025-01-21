@@ -52,7 +52,7 @@ const EventForm = () => {
   
     {/* Form Container */}
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-12">
-      <div className="bg-white shadow-2xl rounded-lg transform transition-all hover:scale-105 duration-300">
+      <div className="bg-white shadow-2xl rounded-lg transform transition-all ">
         <div className="px-6 py-5 border-b border-gray-200">
           <h3 className="text-3xl font-bold leading-6 text-gray-900">Create New Event</h3>
         </div>
@@ -66,7 +66,7 @@ const EventForm = () => {
               type="text"
               id="title"
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200 ease-in-out transform focus:scale-105"
+              className="mt-1 p-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200 ease-in-out transform focus:scale-105 outline-gray-500"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -75,12 +75,12 @@ const EventForm = () => {
           {/* Sport Selection */}
           <div>
             <label htmlFor="sport" className="block text-sm font-medium text-gray-700">
-              Sport
+              Sports
             </label>
             <select
               id="sport"
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200 ease-in-out transform focus:scale-105"
+              className="mt-1 block p-3 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500  transition-all duration-200 ease-in-out transform focus:scale-105 outline-gray-500"
               value={formData.sport}
               onChange={(e) => setFormData({ ...formData, sport: e.target.value })}
             >
@@ -107,7 +107,7 @@ const EventForm = () => {
                   type="date"
                   id="date"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105"
+                  className="focus:ring-indigo-500 p-3 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105 outline-gray-500"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 />
@@ -126,7 +126,7 @@ const EventForm = () => {
                   type="time"
                   id="time"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105"
+                  className="focus:ring-indigo-500 p-3 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105 outline-gray-500"
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                 />
@@ -147,7 +147,7 @@ const EventForm = () => {
                 type="text"
                 id="location"
                 required
-                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105"
+                className="focus:ring-indigo-500 p-3 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105 outline-gray-500"
                 placeholder="Enter location"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -169,7 +169,7 @@ const EventForm = () => {
                 id="maxParticipants"
                 required
                 min="2"
-                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105"
+                className="focus:ring-indigo-500 p-3 outline-gray-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md transition-all duration-200 ease-in-out transform focus:scale-105 "
                 value={formData.maxParticipants}
                 onChange={(e) => setFormData({ ...formData, maxParticipants: e.target.value })}
               />
@@ -184,7 +184,7 @@ const EventForm = () => {
             <textarea
               id="description"
               rows={4}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200 ease-in-out transform focus:scale-105"
+              className="mt-1 block w-full rounded-md outline-gray-500 p-3 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200 ease-in-out transform focus:scale-105"
               placeholder="Add any additional details about the event..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
