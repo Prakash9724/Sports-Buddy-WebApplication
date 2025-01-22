@@ -48,6 +48,16 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    sportsPreferences: {
+        indoor: [{
+            type: String,
+            enum: ['Badminton', 'Table Tennis', 'Chess', 'Carrom', 'Boxing', 'Gym', 'Yoga', 'Swimming']
+        }],
+        outdoor: [{
+            type: String,
+            enum: ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Tennis', 'Athletics', 'Hockey', 'Kabaddi']
+        }]
     }
 }, {
     timestamps: true
