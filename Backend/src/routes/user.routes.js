@@ -8,7 +8,17 @@ const { authenticateUser } = require('../middlewares/authMiddleware');
 // User registration route
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, phone, address, city, state, pincode } = req.body;
+        const { 
+            name, 
+            email, 
+            password, 
+            phone, 
+            address, 
+            city, 
+            state, 
+            pincode,
+            sportsPreferences 
+        } = req.body;
 
         // Check karo ki email already exist toh nahi karta
         const existingUser = await User.findOne({ email });
@@ -17,6 +27,25 @@ router.post('/register', async (req, res) => {
                 success: false,
                 message: "Is email se already ek user registered hai"
             });
+        }
+
+        // Validate sports preferences
+        if (sportsPreferences) {
+            // Indoor sports validation
+            if (sportsPreferences.indoor && !Array.isArray(sportsPreferences.indoor)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Indoor sports array format mein hona chahiye"
+                });
+            }
+
+            // Outdoor sports validation
+            if (sportsPreferences.outdoor && !Array.isArray(sportsPreferences.outdoor)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Outdoor sports array format mein hona chahiye"
+                });
+            }
         }
 
         // Naya user banao
@@ -28,21 +57,36 @@ router.post('/register', async (req, res) => {
             address,
             city,
             state,
-            pincode
+            pincode,
+            sportsPreferences: {
+                indoor: sportsPreferences?.indoor || [],
+                outdoor: sportsPreferences?.outdoor || []
+            }
         });
 
         await user.save();
 
         res.status(201).json({
             success: true,
-            message: "Registration successful ho gaya"
+            message: "Registration successful ho gaya",
+            user: {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                city: user.city,
+                state: user.state,
+                pincode: user.pincode,
+                sportsPreferences: user.sportsPreferences
+            }
         });
 
     } catch (error) {
         console.error("User registration mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Registration fail ho gaya"
+            message: "Registration fail ho gaya",
+            error: error.message
         });
     }
 });
@@ -115,7 +159,15 @@ router.get('/profile', authenticateUser, async (req, res) => {
 // Update user profile
 router.put('/profile', authenticateUser, async (req, res) => {
     try {
-        const { name, phone, address, city, state, pincode } = req.body;
+        const { 
+            name, 
+            phone, 
+            address, 
+            city, 
+            state, 
+            pincode,
+            sportsPreferences 
+        } = req.body;
 
         const user = await User.findById(req.user._id);
         
@@ -125,19 +177,37 @@ router.put('/profile', authenticateUser, async (req, res) => {
         if (city) user.city = city;
         if (state) user.state = state;
         if (pincode) user.pincode = pincode;
+        if (sportsPreferences) {
+            if (sportsPreferences.indoor) {
+                user.sportsPreferences.indoor = sportsPreferences.indoor;
+            }
+            if (sportsPreferences.outdoor) {
+                user.sportsPreferences.outdoor = sportsPreferences.outdoor;
+            }
+        }
 
         await user.save();
 
         res.status(200).json({
             success: true,
             message: "Profile update ho gaya",
-            user
+            user: {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                city: user.city,
+                state: user.state,
+                pincode: user.pincode,
+                sportsPreferences: user.sportsPreferences
+            }
         });
     } catch (error) {
         console.error("Profile update karne mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Profile update nahi ho paya"
+            message: "Profile update nahi ho paya",
+            error: error.message
         });
     }
 });
