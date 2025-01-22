@@ -96,6 +96,14 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Basic validation
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email aur password dono daalna zaroori hai"
+            });
+        }
+
         // User ko dhundo
         const user = await User.findOne({ email });
         if (!user) {
@@ -114,6 +122,15 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Check if JWT_SECRET exists
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET not found");
+            return res.status(500).json({
+                success: false,
+                message: "Server configuration error"
+            });
+        }
+
         // JWT token banao
         const token = jwt.sign(
             { userId: user._id },
@@ -124,14 +141,19 @@ router.post('/login', async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Login successful ho gaya",
-            token
+            token,
+            user: {
+                name: user.name,
+                email: user.email
+            }
         });
 
     } catch (error) {
         console.error("User login mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Login fail ho gaya"
+            message: "Login fail ho gaya",
+            error: error.message // Adding error message for debugging
         });
     }
 });

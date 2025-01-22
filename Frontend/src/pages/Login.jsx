@@ -46,7 +46,7 @@ const Login = () => {
                   name="email"
                   type="email"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  className="focus:ring-indigo-500 p-3 bg-gray-100 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -67,7 +67,7 @@ const Login = () => {
                   name="password"
                   type="password"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  className="focus:ring-indigo-500 p-3 bg-gray-100 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -82,6 +82,7 @@ const Login = () => {
               >
                 Sign in
               </button>
+             
             </div>
           </form>
         </div>
