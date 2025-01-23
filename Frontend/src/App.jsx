@@ -6,7 +6,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Event from './pages/EventForm'
 import SidebarDemo from './pages/SidebarDemo'
-
+// import Login from './components/Login'
 const App = () => {
   return (
     <div>
@@ -14,7 +14,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<SidebarDemo />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
         <Route path="/register" element={<Register />} />
         {/* <Route path="/admin" element={<Admin />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
