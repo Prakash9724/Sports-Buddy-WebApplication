@@ -1,6 +1,7 @@
 import React from "react";
 import Slidebar from "../components/Slidebar";
 import { Users, CalendarDays, Trophy, TrendingUp } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AdminDashboard = () => {
   // Mock data - replace with API calls
@@ -33,6 +34,41 @@ const AdminDashboard = () => {
       change: "+15%",
       bgColor: "bg-pink-50",
     },
+  ];
+
+  // Mock data for activities
+  const recentActivities = [
+    {
+      id: 1,
+      type: "New Registration",
+      user: "Priya Sharma",
+      time: "2 minutes ago",
+      icon: <Users size={20} className="text-blue-500" />,
+    },
+    {
+      id: 2,
+      type: "Event Created",
+      user: "Sports Club Mumbai",
+      time: "1 hour ago",
+      icon: <CalendarDays size={20} className="text-green-500" />,
+    },
+    {
+      id: 3,
+      type: "Tournament Started",
+      user: "Cricket Championship",
+      time: "3 hours ago",
+      icon: <Trophy size={20} className="text-purple-500" />,
+    }
+  ];
+
+  // Mock data for chart
+  const chartData = [
+    { month: 'Jan', users: 400, events: 24 },
+    { month: 'Feb', users: 600, events: 28 },
+    { month: 'Mar', users: 800, events: 35 },
+    { month: 'Apr', users: 1000, events: 40 },
+    { month: 'May', users: 1200, events: 45 },
+    { month: 'Jun', users: 1500, events: 52 },
   ];
 
   return (
@@ -71,21 +107,50 @@ const AdminDashboard = () => {
           </div>
 
           {/* Recent Activities & Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
             {/* Recent Activities */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Recent Activities
-              </h2>
-              {/* Add activities list here */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Recent Activities</h2>
+                <button className="text-sm text-indigo-600 hover:text-indigo-700">View All</button>
+              </div>
+              
+              <div className="space-y-4">
+                {recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                    <div className="p-2 rounded-full bg-gray-50">{activity.icon}</div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-sm font-medium text-gray-900">{activity.type}</p>
+                      <p className="text-sm text-gray-500">{activity.user}</p>
+                    </div>
+                    <span className="text-xs text-gray-400">{activity.time}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Charts */}
+            {/* Participation Trends */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Participation Trends
-              </h2>
-              {/* Add charts here */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Participation Trends</h2>
+                <select className="text-sm border rounded-md p-1">
+                  <option>Last 6 months</option>
+                  <option>Last year</option>
+                </select>
+              </div>
+              
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="users" stroke="#4F46E5" strokeWidth={2} />
+                    <Line type="monotone" dataKey="events" stroke="#10B981" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </div>
