@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Event from './pages/EventForm'
 import SidebarDemo from './pages/SidebarDemo'
 import AllEventsPage from './pages/AllEventsPage'
+import EventForm from './pages/EventForm'
 // import Login from './components/Login'
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-event" element={<Event />} />
         <Route path="/events" element={<AllEventsPage />} />
+        <Route path="/events-form" element={<EventForm />} />
         
       </Routes>
     </div>
