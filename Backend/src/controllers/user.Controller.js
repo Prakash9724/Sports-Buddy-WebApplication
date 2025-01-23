@@ -5,10 +5,12 @@ const jwt = require('jsonwebtoken');
 // User registration controller
 exports.registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { firstName, lastName, email, password } = req.body;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
+        console.log('Registration attempt for:', { email }); // Debug log
+
+        // Check if user exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
         if (existingUser) {
             return res.status(400).json({
                 success: false,
@@ -16,28 +18,41 @@ exports.registerUser = async (req, res) => {
             });
         }
 
-        // Hash password
+        // Hash password explicitly
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create new user
         const user = await User.create({
-            name,
-            email,
+            firstName,
+            lastName,
+            email: email.toLowerCase(),
             password: hashedPassword
+        });
+
+        console.log('New user registered:', {
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            hashedPassword: user.password // Debug log
         });
 
         res.status(201).json({
             success: true,
             message: "Registration successful ho gaya",
-            user
+            user: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            }
         });
 
     } catch (error) {
         console.error("Registration mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Registration mein kuch gadbad ho gayi"
+            message: "Registration mein kuch gadbad ho gayi",
+            error: error.message
         });
     }
 };
@@ -46,43 +61,65 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        
+        console.log('Login attempt for:', { email }); // Debug log
 
-        // Check if user exists
-        const user = await User.findOne({ email });
+        // Basic validation
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email aur password dono daalna zaroori hai"
+            });
+        }
+
+        // User ko dhundo
+        const user = await User.findOne({ email: email.toLowerCase() });
+        console.log('User found:', user ? 'Yes' : 'No'); // Debug log
+
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: "User nahi mila"
+                message: "Email ya password galat hai"
             });
         }
 
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        // Password comparison using the model method
+        const isPasswordValid = await user.comparePassword(password);
+        console.log('Raw password:', password); // Debug log
+        console.log('Hashed password in DB:', user.password); // Debug log
+        console.log('Password validation:', { isValid: isPasswordValid }); // Debug log
+
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
-                message: "Password galat hai"
+                message: "Email ya password galat hai"
             });
         }
 
-        // Generate JWT token
+        // JWT token banao
         const token = jwt.sign(
             { userId: user._id },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '1d' }
         );
 
         res.status(200).json({
             success: true,
             message: "Login successful ho gaya",
-            token
+            token,
+            user: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            }
         });
 
     } catch (error) {
         console.error("Login mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Login mein problem hui"
+            message: "Login mein problem hui",
+            error: error.message
         });
     }
 };

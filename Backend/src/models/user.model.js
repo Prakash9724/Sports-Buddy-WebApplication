@@ -2,9 +2,14 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-    name: {
+    firstName: {
         type: String,
-        required: [true, "User ka naam daalna zaroori hai"],
+        required: [true, "First name daalna zaroori hai"],
+        trim: true
+    },
+    lastName: {
+        type: String,
+        required: [true, "Last name daalna zaroori hai"],
         trim: true
     },
     email: {
@@ -22,24 +27,23 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, "Phone number daalna zaroori hai"],
-        match: [/^[0-9]{10}$/, 'Valid phone number daalo']
+        required: false
     },
     address: {
         type: String,
-        required: [true, "Address daalna zaroori hai"]
+        required: false
     },
     city: {
         type: String,
-        required: [true, "City daalna zaroori hai"]
+        required: false
     },
     state: {
         type: String,
-        required: [true, "State daalna zaroori hai"]
+        required: false
     },
     pincode: {
         type: String,
-        required: [true, "Pincode daalna zaroori hai"]
+        required: false
     },
     registeredEvents: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -63,22 +67,30 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Password ko hash karne ke liye
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-        return next();
+// First name aur last name ko capitalize karne ke liye
+userSchema.pre('save', function(next) {
+    if (this.firstName) {
+        this.firstName = this.firstName.charAt(0).toUpperCase() + this.firstName.slice(1).toLowerCase();
     }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    if (this.lastName) {
+        this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
+    }
     next();
 });
 
-// Name ko capitalize karne ke liye
-userSchema.pre('save', function(next) {
-    this.name = this.name.split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ');
-    next();
-});
+// Password comparison method ko update karenge
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    try {
+        console.log('Comparing passwords:');
+        console.log('Candidate password:', candidatePassword);
+        console.log('Stored hash:', this.password);
+        const isMatch = await bcrypt.compare(candidatePassword, this.password);
+        console.log('Password match result:', isMatch);
+        return isMatch;
+    } catch (error) {
+        console.error('Password comparison error:', error);
+        throw error;
+    }
+};
 
 module.exports = mongoose.model('User', userSchema);
