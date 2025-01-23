@@ -8,6 +8,7 @@ import Event from './pages/EventForm'
 // import SidebarDemo from '../Backup/SidebarDemo'
 import AllEventsPage from './pages/AllEventsPage'
 import EventForm from './pages/EventForm'
+import EventInfo from './pages/EventInfo'
 // import Login from './components/Login'
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/create-event" element={<Event />} />
         <Route path="/events" element={<AllEventsPage />} />
         <Route path="/events-form" element={<EventForm />} />
+        <Route path="/event/:eventId" element={<EventInfo />} />
         
       </Routes>
     </div>
