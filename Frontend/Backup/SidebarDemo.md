@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Sidebar, SidebarBody, SidebarLink } from "../components/ui/SidebarUI.jsx"
+import { Sidebar, SidebarBody, SidebarLink } from "./SidebarUI.jsx/index.js"
 import {
   IconArrowLeft,
   IconBrandTabler,
