@@ -17,3 +17,14 @@
   .animate-wave {
     animation: wave 10s infinite linear;
   }
+
+  .my-masonry-grid {
+    display: flex;
+    margin-left: -16px;
+    width: auto;
+  }
+  
+  .my-masonry-grid_column {
+    padding-left: 16px;
+    background-clip: padding-box;
+  }
