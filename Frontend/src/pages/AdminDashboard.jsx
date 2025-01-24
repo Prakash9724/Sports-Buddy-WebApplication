@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import Slidebar from "../components/Slidebar";
-import { Users, CalendarDays, Trophy, TrendingUp } from "lucide-react";
+import { Users, CalendarDays, Trophy, TrendingUp, Activity, MapPin } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [activities, setActivities] = useState([]);
-  const [chartData, setChartData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalEvents: 0,
+    activeEvents: 0,
+    completedEvents: 0,
+    totalParticipants: 0,
+    popularSports: []
+  });
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch all dashboard data
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -18,82 +23,40 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
-      
-      // Fetch Stats
-      const statsResponse = await fetch('http://localhost:5000/api/admin/stats', {
+      const response = await fetch('http://localhost:4000/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      const statsData = await statsResponse.json();
-
-      // Fetch Recent Activities
-      const activitiesResponse = await fetch('http://localhost:5000/api/admin/activities', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const activitiesData = await activitiesResponse.json();
-
-      // Fetch Chart Data
-      const chartResponse = await fetch('http://localhost:5000/api/admin/participation-trends', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const chartData = await chartResponse.json();
-
-      setStats({
-        totalUsers: {
-          title: "Total Users",
-          value: statsData.totalUsers,
-          icon: <Users size={24} className="text-blue-600" />,
-          change: statsData.userGrowth,
-          bgColor: "bg-blue-50",
-        },
-        activeEvents: {
-          title: "Active Events",
-          value: statsData.activeEvents,
-          icon: <CalendarDays size={24} className="text-green-600" />,
-          change: statsData.eventGrowth,
-          bgColor: "bg-green-50",
-        },
-        sportsCategories: {
-          title: "Sports Categories",
-          value: statsData.sportsCategories,
-          icon: <Trophy size={24} className="text-purple-600" />,
-          change: statsData.categoryGrowth,
-          bgColor: "bg-purple-50",
-        },
-        totalParticipations: {
-          title: "Total Participations",
-          value: statsData.totalParticipations,
-          icon: <TrendingUp size={24} className="text-pink-600" />,
-          change: statsData.participationGrowth,
-          bgColor: "bg-pink-50",
-        },
-      });
-
-      setActivities(activitiesData.activities);
-      setChartData(chartData.trends);
-      setIsLoading(false);
-
+      const data = await response.json();
+      if (data.success) {
+        setStats(data.stats);
+        setRecentActivities(data.recentActivities);
+      }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-      setIsLoading(false);
+      console.error('Error:', error);
+      toast.error('Dashboard data load nahi ho paya');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (isLoading) {
+  // Sample data for charts
+  const participationData = [
+    { name: 'Jan', users: 30 },
+    { name: 'Feb', users: 45 },
+    { name: 'Mar', users: 55 },
+    { name: 'Apr', users: 40 },
+    { name: 'May', users: 65 },
+    { name: 'Jun', users: 75 },
+  ];
+
+  if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen">
         <Slidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading dashboard data...</p>
-          </div>
+        <div className="flex-1 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
       </div>
     );
@@ -103,84 +66,115 @@ const AdminDashboard = () => {
     <div className="flex h-screen bg-gray-50">
       <Slidebar />
       
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+      <div className="flex-1 overflow-auto p-8">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Welcome Back, Admin! 👋</h1>
-            <p className="text-gray-600">Here's what's happening with your platform today.</p>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600">Overview of your sports platform</p>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats && Object.values(stats).map((stat, index) => (
-              <div
-                key={index}
-                className={`${stat.bgColor} p-6 rounded-xl shadow-sm`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2 rounded-lg bg-white shadow-sm">
-                    {stat.icon}
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    parseFloat(stat.change) >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stat.change}%
-                  </span>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-indigo-50 rounded-lg">
+                  <Users className="h-6 w-6 text-indigo-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                  {stat.value.toLocaleString()}
-                </h3>
-                <p className="text-gray-600">{stat.title}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Recent Activities & Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-            {/* Recent Activities */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Activities</h2>
-                <button className="text-sm text-indigo-600 hover:text-indigo-700">View All</button>
-              </div>
-              
-              <div className="space-y-4">
-                {activities.map((activity) => (
-                  <div key={activity.id} className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                    <div className="p-2 rounded-full bg-gray-50">{activity.icon}</div>
-                    <div className="ml-4 flex-1">
-                      <p className="text-sm font-medium text-gray-900">{activity.type}</p>
-                      <p className="text-sm text-gray-500">{activity.user}</p>
-                    </div>
-                    <span className="text-xs text-gray-400">{activity.time}</span>
-                  </div>
-                ))}
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Users</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers}</p>
+                </div>
               </div>
             </div>
 
-            {/* Participation Trends */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Participation Trends</h2>
-                <select className="text-sm border rounded-md p-1">
-                  <option>Last 6 months</option>
-                  <option>Last year</option>
-                </select>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <CalendarDays className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Active Events</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.activeEvents}</p>
+                </div>
               </div>
-              
-              <div className="h-[300px]">
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <Trophy className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Events</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalEvents}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-yellow-50 rounded-lg">
+                  <TrendingUp className="h-6 w-6 text-yellow-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Participants</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stats.totalParticipants}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* User Participation Trend */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">User Participation Trend</h3>
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
+                  <LineChart data={participationData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
                     <Line type="monotone" dataKey="users" stroke="#4F46E5" strokeWidth={2} />
-                    <Line type="monotone" dataKey="events" stroke="#10B981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+
+            {/* Popular Sports */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Popular Sports</h3>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.popularSports}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="participants" fill="#4F46E5" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activities */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Activities</h3>
+            <div className="space-y-6">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-start">
+                  <div className="p-2 bg-gray-50 rounded-lg">
+                    <Activity className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-gray-900">{activity.description}</p>
+                    <p className="text-sm text-gray-500">{new Date(activity.timestamp).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

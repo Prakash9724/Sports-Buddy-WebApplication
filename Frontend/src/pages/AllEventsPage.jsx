@@ -1,79 +1,152 @@
-import React from 'react';
-import Masonry from 'react-masonry-css';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { MapPin, Calendar, Clock, Users } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
-// Sample data for sports events
-const sportsEvents = [
-  {
-    id: 1,
-    image: "https://via.placeholder.com/400x300",
-    title: "Football Tournament",
-    description: "Join the annual football tournament and showcase your skills.",
-    eligibility: "Age 18+",
-    prize: "₹50,000",
-    address: "City Stadium, Mumbai",
-  },
-  {
-    id: 2,
-    image: "https://via.placeholder.com/400x500",
-    title: "Cricket League",
-    description: "Participate in the inter-city cricket league.",
-    eligibility: "Age 16+",
-    prize: "₹1,00,000",
-    address: "National Cricket Ground, Delhi",
-  },
-  {
-    id: 3,
-    image: "https://via.placeholder.com/400x400",
-    title: "Basketball Championship",
-    description: "Compete in the state-level basketball championship.",
-    eligibility: "Age 15+",
-    prize: "₹30,000",
-    address: "Sports Complex, Bangalore",
-  },
-  {
-    id: 4,
-    image: "https://via.placeholder.com/400x600",
-    title: "Marathon",
-    description: "Run for a cause in the annual city marathon.",
-    eligibility: "All ages",
-    prize: "Medals and Certificates",
-    address: "Marine Drive, Mumbai",
-  },
-];
+const AllEventsPage = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sportFilter, setSportFilter] = useState('all');
 
-// Define breakpoints for masonry layout
-const breakpointColumnsObj = {
-  default: 4,
-  1100: 2,
-  700: 1,
-};
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
-function AllEventsPage() {
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/events');
+      const data = await response.json();
+      
+      if (data.success) {
+        setEvents(data.events);
+      } else {
+        toast.error('Events fetch karne mein error aaya');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Events load nahi ho paye');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter events based on search and sport type
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSport = sportFilter === 'all' || event.sportType === sportFilter;
+    return matchesSearch && matchesSport;
+  });
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold text-center mb-8">Sports Events</h1>
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="my-masonry-grid"
-        columnClassName="my-masonry-grid_column"
-      >
-        {sportsEvents.map((event) => (
-          <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
-            <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-2">{event.title}</h2>
-              <p className="text-gray-700 mb-4">{event.description}</p>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600"><span className="font-semibold">Eligibility:</span> {event.eligibility}</p>
-                <p className="text-sm text-gray-600"><span className="font-semibold">Prize:</span> {event.prize}</p>
-                <p className="text-sm text-gray-600"><span className="font-semibold">Address:</span> {event.address}</p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900">Sports Events</h1>
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <select
+            value={sportFilter}
+            onChange={(e) => setSportFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="all">All Sports</option>
+            <option value="indoor">Indoor Sports</option>
+            <option value="outdoor">Outdoor Sports</option>
+          </select>
+        </div>
+
+        {/* Events Grid */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
           </div>
-        ))}
-      </Masonry>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEvents.map((event) => (
+              <Link 
+                to={`/event/${event._id}`}
+                key={event._id} 
+                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="relative h-48">
+                  <img
+                    src={`http://localhost:4000${event.image}`}
+                    alt={event.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2">
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      event.status === 'active' ? 'bg-green-100 text-green-800' : 
+                      event.status === 'completed' ? 'bg-gray-100 text-gray-800' : 
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {event.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h2>
+                  <p className="text-sm text-gray-600 mb-4">{event.description}</p>
+
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>{new Date(event.date).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span>{event.time} ({event.duration})</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span>{event.location}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      <span>{event.currentParticipants}/{event.maxParticipants} participants</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex justify-between items-center">
+                      <span className="text-indigo-600 font-medium">{event.entryFee}</span>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        event.sportType === 'indoor' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {event.sport}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* No Events Message */}
+        {!loading && filteredEvents.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No events found 🏃‍♀️</p>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default AllEventsPage;

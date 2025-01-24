@@ -15,6 +15,7 @@ const {
 const Category = require('../models/categoryModel');
 const Location = require('../models/locationModel');
 const User = require('../models/user.model');
+const Event = require('../models/event.model');
 
 // Admin login route
 router.post('/login', async (req, res) => {
@@ -109,6 +110,67 @@ router.get('/users', isAuthenticated, isAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Users ki list fetch nahi ho payi"
+    });
+  }
+});
+
+// Get dashboard stats
+router.get('/dashboard', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    // Get basic stats
+    const [
+      totalUsers,
+      totalEvents,
+      activeEvents,
+      completedEvents
+    ] = await Promise.all([
+      User.countDocuments(),
+      Event.countDocuments(),
+      Event.countDocuments({ status: 'active' }),
+      Event.countDocuments({ status: 'completed' })
+    ]);
+
+    // Get total participants
+    const participantsResult = await Event.aggregate([
+      { $group: { _id: null, total: { $sum: "$currentParticipants" } } }
+    ]);
+    const totalParticipants = participantsResult[0]?.total || 0;
+
+    // Get popular sports
+    const popularSports = await Event.aggregate([
+      { $group: { _id: "$sport", participants: { $sum: "$currentParticipants" } } },
+      { $project: { name: "$_id", participants: 1, _id: 0 } },
+      { $sort: { participants: -1 } },
+      { $limit: 5 }
+    ]);
+
+    // Get recent activities
+    const recentEvents = await Event.find()
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const recentActivities = recentEvents.map(event => ({
+      description: `New event "${event.title}" was created`,
+      timestamp: event.createdAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalUsers,
+        totalEvents,
+        activeEvents,
+        completedEvents,
+        totalParticipants,
+        popularSports
+      },
+      recentActivities
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Dashboard data fetch karne mein error aaya'
     });
   }
 });
