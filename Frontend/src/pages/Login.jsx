@@ -12,6 +12,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // TODO: Implement login logic with backend
+    try {
+      const response = await fetch('http://localhost:4000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Login successful ho gaya!');
+        navigate('/dashboard');
+      } else {
+        alert(data.message || 'Login fail ho gaya');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
     console.log('Login:', formData);
   };
 

@@ -13,27 +13,27 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // try {
-    //   const response = await fetch('http://localhost:8000/api/v1/users/register', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData)
-    //   });
+    try {
+      const response = await fetch('http://localhost:4000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
 
-    //   const data = await response.json();
+      const data = await response.json();
 
-    //   if (data.success) {
-    //     alert('Registration successful ho gaya!');
-    //     navigate('/login');
-    //   } else {
-    //     alert(data.message || 'Registration fail ho gaya');
-    //   }
-    // } catch (error) {
-    //   console.error('Registration error:', error);
-    //   alert('Registration mein kuch gadbad ho gayi');
-    // }
+      if (data.success) {
+        alert('Registration successful ho gaya!');
+        navigate('/login');
+      } else {
+        alert(data.message || 'Registration fail ho gaya');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('Registration mein kuch gadbad ho gayi');
+    }
 
     console.log(formData);
   };
