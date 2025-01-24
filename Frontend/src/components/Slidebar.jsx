@@ -20,17 +20,17 @@ const Slidebar = () => {
     {
       title: "Dashboard",
       icon: <LayoutDashboard size={24} />,
-      path: "/admin-dashboard",
+      path: "/admin/dashboard",
     },
     {
       title: "Users",
       icon: <Users size={24} />,
-      path: "/admin-dashboard/users",
+      path: "/admin/users",
     },
     {
       title: "Events",
       icon: <CalendarDays size={24} />,
-      path: "/admin-dashboard/events",
+      path: "/admin/events",
     },
     {
       title: "Sports",

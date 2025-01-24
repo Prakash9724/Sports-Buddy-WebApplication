@@ -6,14 +6,23 @@ exports.getAllEvents = async (req, res) => {
       .populate({
         path: 'organizer',
         select: 'firstName lastName',
-        // Only populate if organizer is ObjectId (for user-created events)
+        // Only populate if organizer is ObjectId
         match: { _id: { $exists: true } }
       })
       .sort({ createdAt: -1 });
 
+    // Map events to handle both admin and user organizers
+    const mappedEvents = events.map(event => {
+      const eventObj = event.toObject();
+      if (eventObj.organizer === 'admin') {
+        eventObj.organizerName = 'Admin';
+      }
+      return eventObj;
+    });
+
     res.status(200).json({
       success: true,
-      events
+      events: mappedEvents
     });
   } catch (error) {
     console.error('Error fetching events:', error);

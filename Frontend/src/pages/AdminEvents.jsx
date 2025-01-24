@@ -21,13 +21,17 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/events', {
+      const response = await fetch('http://localhost:4000/api/admin/events', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       const data = await response.json();
-      setEvents(data.events);
+      if (data.success) {
+        setEvents(data.events);
+      } else {
+        toast.error(data.message);
+      }
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching events:', error);
