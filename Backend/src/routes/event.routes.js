@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/eventModel');
 const { authenticateUser } = require('../middlewares/authMiddleware');
+const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { upload } = require('../middleware/multer');
+const {
+  getAllEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+  getEventParticipants,
+  updateEventStatus
+} = require('../controllers/event.controller');
 
 // Saare active events ko get karne ke liye
 router.get('/all', async (req, res) => {
@@ -95,5 +105,13 @@ router.post('/:id/register', authenticateUser, async (req, res) => {
         });
     }
 });
+
+// Admin routes
+router.get('/admin/events', isAuthenticated, isAdmin, getAllEvents);
+router.post('/admin/events', isAuthenticated, isAdmin, upload.single('image'), createEvent);
+router.put('/admin/events/:id', isAuthenticated, isAdmin, upload.single('image'), updateEvent);
+router.delete('/admin/events/:id', isAuthenticated, isAdmin, deleteEvent);
+router.get('/admin/events/:id/participants', isAuthenticated, isAdmin, getEventParticipants);
+router.put('/admin/events/:id/status', isAuthenticated, isAdmin, updateEventStatus);
 
 module.exports = router;

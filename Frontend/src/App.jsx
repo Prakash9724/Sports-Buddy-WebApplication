@@ -11,6 +11,7 @@ import EventForm from "./pages/EventForm";
 import EventInfo from "./pages/EventInfo";
 import Slidebar from "./components/Slidebar";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminEvents from "./pages/AdminEvents";
 // import Login from './components/Login'
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* <Route path="/admin" element={<Admin />} /> */}
+        <Route path="/admin-events" element={<AdminEvents />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-event" element={<Event />} />
         <Route path="/events" element={<AllEventsPage />} />
