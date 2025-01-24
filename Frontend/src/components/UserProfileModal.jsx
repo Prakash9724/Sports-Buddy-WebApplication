@@ -1,243 +1,338 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 
-const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData, type }) => {
-  const [formData, setFormData] = useState({});
-
-  const indoorSports = ['Badminton', 'Table Tennis', 'Chess', 'Carrom', 'Boxing', 'Gym', 'Yoga', 'Swimming'];
-  const outdoorSports = ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Tennis', 'Athletics', 'Hockey', 'Kabaddi'];
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData(type === 'sports' ? {
-        indoor: initialData.indoor || [],
-        outdoor: initialData.outdoor || []
-      } : initialData);
+const UserProfileModal = ({ isOpen, onClose, onSubmit, initialData }) => {
+  const [formData, setFormData] = useState({
+    personal: {
+      firstName: initialData?.personal?.firstName || '',
+      lastName: initialData?.personal?.lastName || '',
+      email: initialData?.personal?.email || '',
+      phone: initialData?.personal?.phone || '',
+      gender: initialData?.personal?.gender || '',
+      dateOfBirth: initialData?.personal?.dateOfBirth || '',
+      address: initialData?.personal?.address || '',
+      city: initialData?.personal?.city || '',
+      state: initialData?.personal?.state || '',
+      pincode: initialData?.personal?.pincode || ''
+    },
+    professional: {
+      occupation: initialData?.professional?.occupation || '',
+      company: initialData?.professional?.company || '',
+      experience: initialData?.professional?.experience || '',
+      education: initialData?.professional?.education || '',
+      skills: initialData?.professional?.skills || []
     }
-  }, [initialData, type]);
+  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const [activeTab, setActiveTab] = useState('personal');
+  const [skillInput, setSkillInput] = useState('');
+
+  const handleChange = (section, field, value) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
     }));
   };
 
-  const handleSportsChange = (category, sport) => {
+  const handleAddSkill = () => {
+    if (skillInput.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        professional: {
+          ...prev.professional,
+          skills: [...prev.professional.skills, skillInput.trim()]
+        }
+      }));
+      setSkillInput('');
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
     setFormData(prev => ({
       ...prev,
-      [category]: prev[category].includes(sport)
-        ? prev[category].filter(s => s !== sport)
-        : [...prev[category], sport]
+      professional: {
+        ...prev.professional,
+        skills: prev.professional.skills.filter(skill => skill !== skillToRemove)
+      }
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Form Data:", formData);
     onSubmit(formData);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {type === 'personal' ? 'Update Personal Details' : 
-               type === 'professional' ? 'Update Professional Details' : 
-               'Update Sports Preferences'}
-            </h2>
-            <button 
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X className="h-6 w-6 text-gray-500" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X className="h-6 w-6" />
             </button>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
-            {type === 'personal' ? (
-              // Personal Details Form
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName || ''}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName || ''}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
+          {/* Tabs */}
+          <div className="border-b border-gray-200 mb-6">
+            <div className="flex space-x-8">
+              <button
+                className={`pb-4 px-1 ${
+                  activeTab === 'personal'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                onClick={() => setActiveTab('personal')}
+              >
+                Personal Details
+              </button>
+              <button
+                className={`pb-4 px-1 ${
+                  activeTab === 'professional'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                onClick={() => setActiveTab('professional')}
+              >
+                Professional Details
+              </button>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <form onSubmit={handleSubmit}>
+            {activeTab === 'personal' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.firstName}
+                    onChange={(e) => handleChange('personal', 'firstName', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.lastName}
+                    onChange={(e) => handleChange('personal', 'lastName', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
                   <input
                     type="email"
-                    name="email"
-                    value={formData.email || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={formData.personal.email}
+                    onChange={(e) => handleChange('personal', 'email', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
                   <input
                     type="tel"
-                    name="phone"
-                    value={formData.phone || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={formData.personal.phone}
+                    onChange={(e) => handleChange('personal', 'phone', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <select
+                    value={formData.personal.gender}
+                    onChange={(e) => handleChange('personal', 'gender', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date of Birth
+                  </label>
                   <input
-                    type="text"
-                    name="address"
-                    value={formData.address || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    type="date"
+                    value={formData.personal.dateOfBirth}
+                    onChange={(e) => handleChange('personal', 'dateOfBirth', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.address}
+                    onChange={(e) => handleChange('personal', 'address', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.city}
+                    onChange={(e) => handleChange('personal', 'city', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.state}
+                    onChange={(e) => handleChange('personal', 'state', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pincode
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.personal.pincode}
+                    onChange={(e) => handleChange('personal', 'pincode', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'professional' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Occupation
+                    </label>
                     <input
                       type="text"
-                      name="city"
-                      value={formData.city || ''}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.professional.occupation}
+                      onChange={(e) => handleChange('professional', 'occupation', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company
+                    </label>
                     <input
                       type="text"
-                      name="state"
-                      value={formData.state || ''}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.professional.company}
+                      onChange={(e) => handleChange('professional', 'company', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Experience
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.professional.experience}
+                      onChange={(e) => handleChange('professional', 'experience', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Education
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.professional.education}
+                      onChange={(e) => handleChange('professional', 'education', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                  <input
-                    type="text"
-                    name="pincode"
-                    value={formData.pincode || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              </>
-            ) : type === 'professional' ? (
-              // Professional Details Form
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
-                  <input
-                    type="text"
-                    name="occupation"
-                    value={formData.occupation || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Experience (years)</label>
-                  <input
-                    type="number"
-                    name="experience"
-                    value={formData.experience || ''}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              </>
-            ) : (
-              // Sports Preferences Form
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">Indoor Sports</h4>
-                  <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                    {indoorSports.map(sport => (
-                      <label key={sport} className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={formData.indoor?.includes(sport)}
-                          onChange={() => handleSportsChange('indoor', sport)}
-                          className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                        />
-                        <span className="text-gray-700">{sport}</span>
-                      </label>
-                    ))}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Skills
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={skillInput}
+                      onChange={(e) => setSkillInput(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Add a skill"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddSkill}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                      Add
+                    </button>
                   </div>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">Outdoor Sports</h4>
-                  <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                    {outdoorSports.map(sport => (
-                      <label key={sport} className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={formData.outdoor?.includes(sport)}
-                          onChange={() => handleSportsChange('outdoor', sport)}
-                          className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                        />
-                        <span className="text-gray-700">{sport}</span>
-                      </label>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.professional.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm flex items-center"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="ml-2 text-indigo-400 hover:text-indigo-600"
+                        >
+                          ×
+                        </button>
+                      </span>
                     ))}
                   </div>
                 </div>
               </div>
             )}
-          </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
