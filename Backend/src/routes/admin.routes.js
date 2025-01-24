@@ -9,10 +9,12 @@ const {
   updateEvent,
   deleteEvent,
   getEventParticipants,
-  updateEventStatus
+  updateEventStatus,
+  getEventById
 } = require('../controllers/event.controller');
 const Category = require('../models/categoryModel');
 const Location = require('../models/locationModel');
+const User = require('../models/user.model');
 
 // Admin login route
 router.post('/login', async (req, res) => {
@@ -54,6 +56,7 @@ router.post('/login', async (req, res) => {
 // Admin Event Routes
 router.get('/events', isAuthenticated, isAdmin, getAllEvents);
 router.post('/events', isAuthenticated, isAdmin, upload.single('image'), createEvent);
+router.get('/events/:id', isAuthenticated, isAdmin, getEventById);
 router.put('/events/:id', isAuthenticated, isAdmin, upload.single('image'), updateEvent);
 router.delete('/events/:id', isAuthenticated, isAdmin, deleteEvent);
 router.get('/events/:id/participants', isAuthenticated, isAdmin, getEventParticipants);
@@ -91,6 +94,23 @@ router.get('/locations', isAuthenticated, isAdmin, async (req, res) => {
             message: "Locations fetch nahi ho payi"
         });
     }
+});
+
+// Get all users
+router.get('/users', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.status(200).json({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.error("Users fetch karne mein error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Users ki list fetch nahi ho payi"
+    });
+  }
 });
 
 module.exports = router;

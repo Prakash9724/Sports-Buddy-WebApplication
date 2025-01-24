@@ -72,12 +72,38 @@ exports.createEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const updateData = { ...req.body };
+
+    // Handle image upload if present
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+
+    // Remove participants field if it's empty or invalid
+    if (!updateData.participants || updateData.participants.length === 0) {
+      delete updateData.participants;
+    }
+
+    // Parse arrays if they're sent as strings
+    if (typeof updateData.rules === 'string') {
+      updateData.rules = JSON.parse(updateData.rules);
+    }
+    if (typeof updateData.facilities === 'string') {
+      updateData.facilities = JSON.parse(updateData.facilities);
+    }
+
+    // Remove empty arrays
+    if (Array.isArray(updateData.rules) && updateData.rules.length === 1 && updateData.rules[0] === '') {
+      delete updateData.rules;
+    }
+    if (Array.isArray(updateData.facilities) && updateData.facilities.length === 1 && updateData.facilities[0] === '') {
+      delete updateData.facilities;
+    }
 
     const event = await Event.findByIdAndUpdate(
       id,
       updateData,
-      { new: true }
+      { new: true, runValidators: false } // Disable validation for update
     );
 
     if (!event) {
@@ -186,14 +212,12 @@ exports.updateEventStatus = async (req, res) => {
 
 exports.getEventById = async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id)
-      .populate('organizer', 'firstName lastName')
-      .populate('participants', 'firstName lastName');
-
+    const event = await Event.findById(req.params.id);
+    
     if (!event) {
       return res.status(404).json({
         success: false,
-        message: "Event not found"
+        message: "Event nahi mila"
       });
     }
 
@@ -205,7 +229,7 @@ exports.getEventById = async (req, res) => {
     console.error('Error fetching event:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch event details'
+      message: 'Event details fetch karne mein error aaya'
     });
   }
 }; 

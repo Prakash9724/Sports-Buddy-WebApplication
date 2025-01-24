@@ -66,10 +66,13 @@ const eventSchema = new mongoose.Schema({
     enum: ['active', 'completed', 'cancelled'],
     default: 'active'
   },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
+  participants: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+    default: []
+  },
   organizer: {
     type: mongoose.Schema.Types.Mixed,
     required: true
