@@ -8,27 +8,36 @@ exports.isAuthenticated = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Please login first'
+        message: "Please login first"
       });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.userId);
+    req.user = decoded;
     next();
   } catch (error) {
+    console.error("Token verification error:", error);
     res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      message: "Invalid token"
     });
   }
 };
 
 exports.isAdmin = async (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({
+  try {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required"
+      });
+    }
+    next();
+  } catch (error) {
+    console.error("Admin verification error:", error);
+    res.status(403).json({
       success: false,
-      message: 'Admin access required'
+      message: "Admin verification failed"
     });
   }
-  next();
 }; 

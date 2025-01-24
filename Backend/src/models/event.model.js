@@ -10,6 +10,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  sportType: {
+    type: String,
+    enum: ['indoor', 'outdoor'],
+    required: true
+  },
   date: {
     type: Date,
     required: true
@@ -46,7 +51,13 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  eligibility: String,
+  eligibility: {
+    minHeight: Number,
+    maxHeight: Number,
+    minWeight: Number,
+    maxWeight: Number,
+    otherRequirements: String
+  },
   rules: [String],
   facilities: [String],
   image: String,
@@ -60,10 +71,10 @@ const eventSchema = new mongoose.Schema({
     ref: 'User'
   }],
   organizer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+    ref: 'User'
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Event', eventSchema); 
+module.exports = mongoose.models.Event || mongoose.model('Event', eventSchema); 

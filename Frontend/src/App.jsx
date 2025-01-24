@@ -12,6 +12,7 @@ import EventInfo from "./pages/EventInfo";
 import Slidebar from "./components/Slidebar";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminEvents from "./pages/AdminEvents";
+import AdminLogin from './pages/AdminLogin';
 // import Login from './components/Login'
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/event/:eventId" element={<EventInfo />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/slidebar" element={<Slidebar />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
       </Routes>
     </div>
   );

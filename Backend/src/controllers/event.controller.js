@@ -1,10 +1,14 @@
 const Event = require('../models/event.model');
-const { uploadToCloudinary } = require('../utils/cloudinary'); // Assuming you have cloudinary setup
 
 exports.getAllEvents = async (req, res) => {
   try {
     const events = await Event.find()
-      .populate('organizer', 'firstName lastName')
+      .populate({
+        path: 'organizer',
+        select: 'firstName lastName',
+        // Only populate if organizer is ObjectId (for user-created events)
+        match: { _id: { $exists: true } }
+      })
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -26,12 +30,19 @@ exports.createEvent = async (req, res) => {
     
     // Handle image upload if present
     if (req.file) {
-      const result = await uploadToCloudinary(req.file.path);
-      eventData.image = result.secure_url;
+      eventData.image = `/uploads/${req.file.filename}`;
     }
 
-    // Add organizer (admin) to event data
-    eventData.organizer = req.user.id;
+    // Add organizer
+    eventData.organizer = 'admin'; // Just use 'admin' string for admin-created events
+
+    // Parse arrays if they're sent as strings
+    if (typeof eventData.rules === 'string') {
+      eventData.rules = JSON.parse(eventData.rules);
+    }
+    if (typeof eventData.facilities === 'string') {
+      eventData.facilities = JSON.parse(eventData.facilities);
+    }
 
     const event = await Event.create(eventData);
 
@@ -53,12 +64,6 @@ exports.updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-
-    // Handle image update if present
-    if (req.file) {
-      const result = await uploadToCloudinary(req.file.path);
-      updateData.image = result.secure_url;
-    }
 
     const event = await Event.findByIdAndUpdate(
       id,
@@ -166,6 +171,32 @@ exports.updateEventStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Status update karne mein error aaya'
+    });
+  }
+};
+
+exports.getEventById = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id)
+      .populate('organizer', 'firstName lastName')
+      .populate('participants', 'firstName lastName');
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      event
+    });
+  } catch (error) {
+    console.error('Error fetching event:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch event details'
     });
   }
 }; 

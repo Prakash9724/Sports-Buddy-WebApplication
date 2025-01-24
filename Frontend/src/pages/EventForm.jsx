@@ -71,42 +71,38 @@ const EventForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const formDataToSend = new FormData();
+    try {
+      const token = localStorage.getItem('token');
+      const formDataToSend = new FormData();
       
-    //   // Append all form fields to FormData
-    //   Object.keys(formData).forEach(key => {
-    //     if (key === 'rules' || key === 'facilities') {
-    //       formDataToSend.append(key, JSON.stringify(formData[key]));
-    //     } else {
-    //       formDataToSend.append(key, formData[key]);
-    //     }
-    //   });
+      Object.keys(formData).forEach(key => {
+        if (key === 'rules' || key === 'facilities') {
+          formDataToSend.append(key, JSON.stringify(formData[key]));
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
 
-    //   const response = await fetch('http://localhost:5000/api/admin/events', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`
-    //     },
-    //     body: formDataToSend
-    //   });
+      const response = await fetch('http://localhost:4000/api/admin/events', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataToSend
+      });
 
-    //   const data = await response.json();
+      const data = await response.json();
 
-    //   if (data.success) {
-    //     toast.success('Event created successfully!');
-    //     navigate('/admin-events');
-    //   } else {
-    //     toast.error(data.message);
-    //   }
-    // } catch (error) {
-    //   console.error('Error creating event:', error);
-    //   toast.error('Failed to create event');
-    // }
-
-    console.log(formData);
-    
+      if (data.success) {
+        toast.success('Event created successfully!');
+        navigate('/admin-events');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error('Failed to create event');
+    }
   };
 
   return (

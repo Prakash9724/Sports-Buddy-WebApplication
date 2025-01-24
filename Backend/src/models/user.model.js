@@ -78,7 +78,7 @@ userSchema.pre('save', function(next) {
     next();
 });
 
-// Password comparison method ko update karenge
+// Password comparison method
 userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
         console.log('Comparing passwords:');
