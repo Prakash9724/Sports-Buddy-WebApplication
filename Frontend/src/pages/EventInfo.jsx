@@ -1,59 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { MapPin, Calendar, Clock, Users, Trophy, AlertCircle, CheckCircle } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, AlertCircle, CheckCircle, Mail, Phone } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const EventInfo = () => {
-  const { eventId } = useParams();
+  const { id } = useParams();
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  // Mock event data - replace with API call
-  const event = {
-    id: eventId,
-    title: 'Weekend Football Tournament',
-    sport: 'Football',
-    image: 'https://cdn.britannica.com/69/228369-050-0B18A1F6/Asian-Cup-Final-2019-Hasan-Al-Haydos-Qatar-Japan-Takumi-Minamino.jpg', // Replace with actual image URL
-    date: '2024-03-20',
-    time: '10:00 AM',
-    duration: '4 hours',
-    location: 'Central Park Football Ground',
-    address: '123, Sports Complex, Central Park, Mumbai',
-    eligibility: '18+ years, Any skill level welcome',
-    maxParticipants: 22,
-    currentParticipants: 15,
-    registrationDeadline: '2024-03-18',
-    entryFee: '₹200 per person',
-    description: 'Join us for an exciting football tournament! This event is perfect for both beginners and experienced players. Teams will be formed on the spot to ensure fair play.',
-    rules: [
-      'Players must bring their own sports shoes',
-      'Tournament format will be decided based on final participation',
-      'Fair play is mandatory',
-      'Organizers decision will be final'
-    ],
-    facilities: [
-      'Changing rooms available',
-      'First aid support',
-      'Drinking water',
-      'Parking space'
-    ],
-    organizer: {
-      name: 'Sports Buddy Organization',
-      contact: '+91 9876543210',
-      email: 'organizer@sportsbuddy.com'
+  useEffect(() => {
+    fetchEventDetails();
+  }, [id]);
+
+  const fetchEventDetails = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/events/${id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log("Event data:", data.event); // Debug log
+        setEvent(data.event);
+      } else {
+        toast.error('Event details nahi mil paye');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Event load nahi ho paya');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRegistration = async () => {
     try {
-      // API call to register user for the event
-      console.log('Registering for event:', eventId);
-      setIsRegistered(true);
-      // Show success message
-      alert('Registration successful!');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Please login first');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:4000/api/events/${id}/register`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setIsRegistered(true);
+        toast.success('Registration successful! 🎉');
+        // Refresh event details to update participants count
+        fetchEventDetails();
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      console.error('Error:', error);
+      toast.error('Registration failed. Please try again.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Event not found 😢</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -61,11 +84,11 @@ const EventInfo = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Event Image and Quick Info */}
           <div className="lg:col-span-5">
-            {/* Event Image */}
             <div className="sticky top-8">
+              {/* Event Image */}
               <div className="relative h-[400px] rounded-xl overflow-hidden mb-6">
                 <img
-                  src={event.image}
+                  src={`http://localhost:4000${event.image}`}
                   alt={event.title}
                   className="w-full h-full object-cover"
                 />
@@ -77,7 +100,7 @@ const EventInfo = () => {
                       {event.sport}
                     </span>
                     <span className="text-white/90 text-sm">
-                      {event.date} at {event.time}
+                      {new Date(event.date).toLocaleDateString()} at {event.time}
                     </span>
                   </div>
                 </div>
@@ -102,10 +125,12 @@ const EventInfo = () => {
               {/* Registration Button */}
               <button
                 onClick={handleRegistration}
-                disabled={isRegistered}
+                disabled={isRegistered || event.currentParticipants >= event.maxParticipants}
                 className={`w-full py-4 px-6 rounded-xl text-white font-medium text-lg transition-all ${
                   isRegistered
                     ? 'bg-green-600 cursor-not-allowed'
+                    : event.currentParticipants >= event.maxParticipants
+                    ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200'
                 }`}
               >
@@ -114,6 +139,8 @@ const EventInfo = () => {
                     <CheckCircle className="h-6 w-6 mr-2" />
                     Registered Successfully
                   </span>
+                ) : event.currentParticipants >= event.maxParticipants ? (
+                  'Event Full'
                 ) : (
                   'Register Now'
                 )}
@@ -149,14 +176,15 @@ const EventInfo = () => {
                     <AlertCircle className="h-5 w-5 mr-3 text-indigo-600" />
                     <div>
                       <p className="font-medium">Eligibility</p>
-                      <p>{event.eligibility}</p>
+                      <p>{event.eligibility?.otherRequirements || 'Open for all'}</p>
                     </div>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Calendar className="h-5 w-5 mr-3 text-indigo-600" />
                     <div>
-                      <p className="font-medium">Registration Deadline</p>
-                      <p>{event.registrationDeadline}</p>
+                      <p className="font-medium">Date & Time</p>
+                      <p>{new Date(event.date).toLocaleDateString()} at {event.time}</p>
+                      <p className="text-sm text-gray-500">Duration: {event.duration}</p>
                     </div>
                   </div>
                 </div>
@@ -184,27 +212,35 @@ const EventInfo = () => {
               <h2 className="text-xl font-semibold mb-4">About the Event</h2>
               <p className="text-gray-600 mb-6 leading-relaxed">{event.description}</p>
 
-              <h3 className="text-lg font-semibold mb-3">Rules & Guidelines</h3>
-              <ul className="space-y-2 text-gray-600 mb-6">
-                {event.rules.map((rule, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className=" w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-sm flex items-center justify-center mr-3 mt-0.5">
-                      {index + 1}
-                    </span>
-                    {rule}
-                  </li>
-                ))}
-              </ul>
+              {event.rules && event.rules.length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold mb-3">Rules & Guidelines</h3>
+                  <ul className="space-y-2 text-gray-600 mb-6">
+                    {event.rules.map((rule, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-sm flex items-center justify-center mr-3 mt-0.5">
+                          {index + 1}
+                        </span>
+                        {rule}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-              <h3 className="text-lg font-semibold mb-3">Facilities Available</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {event.facilities.map((facility, index) => (
-                  <div key={index} className="flex items-center bg-gray-50 p-3 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span className="text-gray-600">{facility}</span>
+              {event.facilities && event.facilities.length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold mb-3">Facilities Available</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {event.facilities.map((facility, index) => (
+                      <div key={index} className="flex items-center bg-gray-50 p-3 rounded-lg">
+                        <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                        <span className="text-gray-600">{facility}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
 
             {/* Organizer Details */}
