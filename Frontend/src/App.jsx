@@ -16,6 +16,8 @@ import AdminEventsList from './pages/AdminEventsList';
 import AdminUsers from './pages/AdminUsers';
 import Navbar from './components/Navbar';
 import MyEvents from './pages/MyEvents';
+import Footer from './components/Footer';
+import About from './pages/About';
 // import Login from './components/Login'
 const App = () => {
   return (
@@ -41,8 +43,10 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/events" element={<AllEventsPage />} />
           <Route path="/my-events" element={<MyEvents />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </div>
+      <Footer />
     </>
   );
 };
