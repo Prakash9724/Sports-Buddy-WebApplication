@@ -32,7 +32,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="SportsBuddy" className="h-8 w-auto" />
+            <img src="/images/logo.png" alt="SportsBuddy" className="h-8 w-auto" />
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               SportsBuddy
             </span>
