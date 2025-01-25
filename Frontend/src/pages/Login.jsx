@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,28 +12,28 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement login logic with backend
     try {
       const response = await fetch('http://localhost:4000/api/users/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
 
       const data = await response.json();
-
+      
       if (data.success) {
-        alert('Login successful ho gaya!');
+        localStorage.setItem('token', data.token);
+        toast.success('Login successful!');
         navigate('/dashboard');
       } else {
-        alert(data.message || 'Login fail ho gaya');
+        toast.error(data.message);
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Error:', error);
+      toast.error('Login failed. Please try again.');
     }
-    console.log('Login:', formData);
   };
 
   return (
@@ -102,7 +103,6 @@ const Login = () => {
               >
                 Sign in
               </button>
-             
             </div>
           </form>
         </div>

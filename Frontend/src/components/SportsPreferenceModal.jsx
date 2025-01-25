@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const indoorSports = ['Badminton', 'Table Tennis', 'Chess', 'Carrom', 'Boxing', 'Gym', 'Yoga', 'Swimming'];
 const outdoorSports = ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Tennis', 'Athletics', 'Hockey', 'Kabaddi'];
 
-const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }) => {
-  const [selectedSports, setSelectedSports] = useState({
-    indoor: initialPreferences?.indoor || [],
-    outdoor: initialPreferences?.outdoor || []
+const SportsPreferenceModal = ({ isOpen, onClose, user, onUpdate }) => {
+  const [formData, setFormData] = useState({
+    indoor: user?.sportsPreferences?.indoor || [],
+    outdoor: user?.sportsPreferences?.outdoor || [],
+    skillLevel: user?.sportsPreferences?.skillLevel || '',
+    availability: user?.sportsPreferences?.availability || [],
+    preferredLocations: user?.sportsPreferences?.preferredLocations || []
   });
 
   const toggleSport = (type, sport) => {
-    setSelectedSports(prev => ({
+    setFormData(prev => ({
       ...prev,
       [type]: prev[type].includes(sport)
         ? prev[type].filter(s => s !== sport)
@@ -19,10 +23,32 @@ const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sports Preferences:", selectedSports);
-    onSubmit(selectedSports);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:4000/api/users/sports-preferences', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ sportsPreferences: formData })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Sports preferences update ho gaye!');
+        onUpdate(data.user);
+        onClose();
+      } else {
+        toast.error(data.message || 'Update failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Sports preferences update nahi ho paye');
+    }
   };
 
   if (!isOpen) return null;
@@ -47,7 +73,7 @@ const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }
                   <label
                     key={sport}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border cursor-pointer transition-colors
-                      ${selectedSports.indoor.includes(sport)
+                      ${formData.indoor.includes(sport)
                         ? 'bg-blue-50 border-blue-500 text-blue-700'
                         : 'border-gray-200 hover:border-blue-500'
                       }`}
@@ -55,7 +81,7 @@ const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }
                     <input
                       type="checkbox"
                       className="hidden"
-                      checked={selectedSports.indoor.includes(sport)}
+                      checked={formData.indoor.includes(sport)}
                       onChange={() => toggleSport('indoor', sport)}
                     />
                     <span>{sport}</span>
@@ -72,7 +98,7 @@ const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }
                   <label
                     key={sport}
                     className={`flex items-center justify-center px-4 py-2 rounded-lg border cursor-pointer transition-colors
-                      ${selectedSports.outdoor.includes(sport)
+                      ${formData.outdoor.includes(sport)
                         ? 'bg-green-50 border-green-500 text-green-700'
                         : 'border-gray-200 hover:border-green-500'
                       }`}
@@ -80,13 +106,29 @@ const SportsPreferenceModal = ({ isOpen, onClose, onSubmit, initialPreferences }
                     <input
                       type="checkbox"
                       className="hidden"
-                      checked={selectedSports.outdoor.includes(sport)}
+                      checked={formData.outdoor.includes(sport)}
                       onChange={() => toggleSport('outdoor', sport)}
                     />
                     <span>{sport}</span>
                   </label>
                 ))}
               </div>
+            </div>
+
+            {/* Skill Level */}
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Skill Level</h3>
+              <select
+                value={formData.skillLevel}
+                onChange={(e) => setFormData(prev => ({ ...prev, skillLevel: e.target.value }))}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Select Skill Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Professional">Professional</option>
+              </select>
             </div>
 
             <div className="flex justify-end space-x-3">

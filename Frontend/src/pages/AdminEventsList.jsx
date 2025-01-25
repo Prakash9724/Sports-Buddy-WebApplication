@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import Slidebar from '../components/Slidebar';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, X } from 'lucide-react';
 
 const AdminEventsList = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showParticipants, setShowParticipants] = useState(false);
 
   useEffect(() => {
     fetchEvents();
@@ -74,6 +76,29 @@ const AdminEventsList = () => {
         console.error('Error deleting event:', error);
         toast.error('Failed to delete event');
       }
+    }
+  };
+
+  const fetchParticipants = async (eventId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:4000/api/admin/events/${eventId}/participants`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setSelectedEvent({
+          ...events.find(e => e._id === eventId),
+          participants: data.participants
+        });
+        setShowParticipants(true);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Participants ki list load nahi hui');
     }
   };
 
@@ -186,6 +211,35 @@ const AdminEventsList = () => {
           )}
         </div>
       </div>
+
+      {showParticipants && selectedEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold">Participants - {selectedEvent.title}</h2>
+              <button onClick={() => setShowParticipants(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {selectedEvent.participants.map((participant) => (
+                <div key={participant._id} className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{participant.firstName} {participant.lastName}</p>
+                      <p className="text-sm text-gray-500">{participant.email}</p>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(participant.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

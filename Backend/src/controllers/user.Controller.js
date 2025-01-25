@@ -83,12 +83,9 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // Password comparison using the model method
+        // Password check karo
         const isPasswordValid = await user.comparePassword(password);
-        console.log('Raw password:', password); // Debug log
-        console.log('Hashed password in DB:', user.password); // Debug log
-        console.log('Password validation:', { isValid: isPasswordValid }); // Debug log
-
+        
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
@@ -96,10 +93,14 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // JWT token banao
+        // Generate JWT token with user ID and role
         const token = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_SECRET || 'your-secret-key',
+            { 
+                _id: user._id, // Changed from userId to _id
+                email: user.email,
+                role: 'user'  // Add role for user
+            },
+            process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
 
@@ -118,16 +119,26 @@ exports.loginUser = async (req, res) => {
         console.error("Login mein error:", error);
         res.status(500).json({
             success: false,
-            message: "Login mein problem hui",
+            message: "Login karne mein problem hui",
             error: error.message
         });
     }
 };
 
-// Get user profile
+// Get user profile with all details
 exports.getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user._id)
+            .select('-password')
+            .populate('registeredEvents');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
         res.status(200).json({
             success: true,
             user
@@ -144,12 +155,31 @@ exports.getUserProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { personal, professional, sportsPreferences } = req.body;
+
+        // Format date if it exists
+        if (personal?.dateOfBirth) {
+            personal.dateOfBirth = new Date(personal.dateOfBirth);
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
-            { name, email },
+            req.user._id,
+            {
+                $set: {
+                    personal,
+                    professional,
+                    sportsPreferences
+                }
+            },
             { new: true }
         ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
 
         res.status(200).json({
             success: true,

@@ -25,25 +25,31 @@ const userSchema = new mongoose.Schema({
         required: [true, "Password daalna zaroori hai"],
         minlength: [6, "Password kam se kam 6 characters ka hona chahiye"]
     },
-    phone: {
-        type: String,
-        required: false
+    // Personal Information
+    personal: {
+        phone: String,
+        gender: String,
+        dateOfBirth: Date,
+        address: String,
+        city: String,
+        state: String,
+        pincode: String
     },
-    address: {
-        type: String,
-        required: false
+    // Professional Information
+    professional: {
+        occupation: String,
+        company: String,
+        experience: String,
+        education: String,
+        skills: [String]
     },
-    city: {
-        type: String,
-        required: false
-    },
-    state: {
-        type: String,
-        required: false
-    },
-    pincode: {
-        type: String,
-        required: false
+    // Sports Preferences
+    sportsPreferences: {
+        indoor: [String],
+        outdoor: [String],
+        skillLevel: String,
+        availability: [String],
+        preferredLocations: [String]
     },
     registeredEvents: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -52,16 +58,6 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
-    },
-    sportsPreferences: {
-        indoor: [{
-            type: String,
-            enum: ['Badminton', 'Table Tennis', 'Chess', 'Carrom', 'Boxing', 'Gym', 'Yoga', 'Swimming']
-        }],
-        outdoor: [{
-            type: String,
-            enum: ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Tennis', 'Athletics', 'Hockey', 'Kabaddi']
-        }]
     }
 }, {
     timestamps: true

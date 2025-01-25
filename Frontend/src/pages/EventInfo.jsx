@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, Clock, Users, AlertCircle, CheckCircle, Mail, Phone } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const EventInfo = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -37,24 +38,27 @@ const EventInfo = () => {
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('Please login first');
+        navigate('/login');
         return;
       }
 
       const response = await fetch(`http://localhost:4000/api/events/${id}/register`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
       const data = await response.json();
+      
       if (data.success) {
         setIsRegistered(true);
         toast.success('Registration successful! 🎉');
-        // Refresh event details to update participants count
+        // Refresh event details
         fetchEventDetails();
       } else {
-        toast.error(data.message);
+        toast.error(data.message || 'Registration failed');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -123,28 +127,25 @@ const EventInfo = () => {
               </div>
 
               {/* Registration Button */}
-              <button
-                onClick={handleRegistration}
-                disabled={isRegistered || event.currentParticipants >= event.maxParticipants}
-                className={`w-full py-4 px-6 rounded-xl text-white font-medium text-lg transition-all ${
-                  isRegistered
-                    ? 'bg-green-600 cursor-not-allowed'
-                    : event.currentParticipants >= event.maxParticipants
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200'
-                }`}
-              >
-                {isRegistered ? (
-                  <span className="flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 mr-2" />
-                    Registered Successfully
-                  </span>
-                ) : event.currentParticipants >= event.maxParticipants ? (
-                  'Event Full'
-                ) : (
-                  'Register Now'
-                )}
-              </button>
+              <div className="mt-6">
+                <button
+                  onClick={handleRegistration}
+                  disabled={isRegistered || event?.currentParticipants >= event?.maxParticipants}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-center ${
+                    isRegistered 
+                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      : event?.currentParticipants >= event?.maxParticipants
+                        ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  {isRegistered 
+                    ? 'Already Registered ✓'
+                    : event?.currentParticipants >= event?.maxParticipants
+                      ? 'Event Full'
+                      : 'Register Now'}
+                </button>
+              </div>
             </div>
           </div>
 

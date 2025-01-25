@@ -12,82 +12,83 @@ const {
     changePassword 
 } = require('../controllers/user.Controller');
 
-// User registration route
+// Public routes
 router.post('/register', registerUser);
-
-// User login route
 router.post('/login', loginUser);
 
-// Get user profile
+// Protected routes
 router.get('/profile', authenticateUser, getUserProfile);
-
-// Update user profile
 router.put('/profile', authenticateUser, updateProfile);
+router.put('/change-password', authenticateUser, changePassword);
 
 // Get user's registered events
-router.get('/my-events', authenticateUser, async (req, res) => {
+router.get('/registered-events', authenticateUser, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id)
+        const user = await User.findById(req.user._id);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Check if registeredEvents exists
+        if (!user.registeredEvents) {
+            return res.status(200).json({
+                success: true,
+                events: []
+            });
+        }
+
+        // Populate events data
+        const populatedUser = await User.findById(user._id)
             .populate({
                 path: 'registeredEvents',
-                populate: [
-                    { path: 'category', select: 'name' },
-                    { path: 'createdBy', select: 'name email' }
-                ]
+                select: 'title sport date time location image currentParticipants maxParticipants'
             });
 
         res.status(200).json({
             success: true,
-            events: user.registeredEvents
+            events: populatedUser.registeredEvents || []
         });
     } catch (error) {
-        console.error("Events fetch karne mein error:", error);
+        console.error('Error:', error);
         res.status(500).json({
             success: false,
-            message: "Events fetch nahi ho paye"
+            message: 'Events fetch karne mein error aaya'
         });
     }
 });
 
-router.post('/change-password', authenticateUser, changePassword);
-
-// Get user's registered events
-router.get('/registered-events', authenticateUser, async (req, res) => {
+// Update sports preferences
+router.put('/sports-preferences', authenticateUser, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate('registeredEvents');
+    const { sportsPreferences } = req.body;
     
-    res.status(200).json({
-      success: true,
-      events: user.registeredEvents
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Events fetch karne mein error aaya'
-    });
-  }
-});
-
-// Update user profile
-router.put('/profile', authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      req.body,
+      { $set: { sportsPreferences } },
       { new: true }
-    );
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
     res.status(200).json({
       success: true,
-      message: 'Profile update ho gaya',
-      user
+      message: "Sports preferences update ho gaye",
+      user: updatedUser
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Sports preferences update mein error:", error);
     res.status(500).json({
       success: false,
-      message: 'Profile update karne mein error aaya'
+      message: "Update karne mein problem hui"
     });
   }
 });

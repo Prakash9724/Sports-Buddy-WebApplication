@@ -4,29 +4,32 @@ const User = require('../models/user.model');
 // User authentication middleware
 exports.authenticateUser = async (req, res, next) => {
     try {
-        // Token ko header se nikalo
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        const token = req.headers.authorization?.split(' ')[1];
         
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: "Token nahi mila, login karo pehle"
+                message: "Please login first"
             });
         }
 
-        // Token ko verify karo
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // User ko dhundo
-        const user = await User.findById(decoded.userId);
+        // Check if it's an admin token
+        if (decoded.role === 'admin') {
+            req.user = { role: 'admin' };
+            return next();
+        }
+
+        // For regular users, verify in database
+        const user = await User.findById(decoded._id).select('-password');
         if (!user) {
             return res.status(401).json({
-                success: false, 
-                message: "User nahi mila"
+                success: false,
+                message: "User not found"
             });
         }
 
-        // User ko request mein add karo
         req.user = user;
         next();
 
@@ -34,7 +37,7 @@ exports.authenticateUser = async (req, res, next) => {
         console.error("Authentication mein error:", error);
         res.status(401).json({
             success: false,
-            message: "Authentication fail ho gaya"
+            message: "Authentication failed"
         });
     }
 };

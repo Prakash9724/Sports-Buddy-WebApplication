@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, isAdmin } = require('../middleware/auth.middleware');
 const { upload } = require('../middleware/multer');
 const {
   getAllEvents,
@@ -32,9 +32,9 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Generate JWT token
+        // Generate token with admin role
         const token = jwt.sign(
-            { userId: 'admin', role: 'admin' },
+            { role: 'admin' },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
@@ -99,19 +99,19 @@ router.get('/locations', isAuthenticated, isAdmin, async (req, res) => {
 
 // Get all users
 router.get('/users', isAuthenticated, isAdmin, async (req, res) => {
-  try {
-    const users = await User.find().select('-password');
-    res.status(200).json({
-      success: true,
-      users
-    });
-  } catch (error) {
-    console.error("Users fetch karne mein error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Users ki list fetch nahi ho payi"
-    });
-  }
+    try {
+        const users = await User.find().select('-password');
+        res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch users"
+        });
+    }
 });
 
 // Get dashboard stats
