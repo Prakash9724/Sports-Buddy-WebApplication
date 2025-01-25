@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, Calendar, Home, LogOut, Settings, Heart } from 'lucide-react';
+import { Menu, X, User, Calendar, Home, LogOut, Settings, Heart, Info } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,8 +63,8 @@ const Navbar = () => {
                   to="/about"
                   className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600"
                 >
-                  <Settings className="h-5 w-5 mr-2" />
-                  Settings
+                  <Info className="h-5 w-5 mr-2" />
+                  About
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -129,12 +129,12 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link
-                  to="/profile"
+                  to="/about"
                   className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Settings className="h-5 w-5 mr-2" />
-                  Settings
+                  <Info className="h-5 w-5 mr-2" />
+                  About
                 </Link>
                 <button
                   onClick={() => {

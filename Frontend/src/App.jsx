@@ -19,12 +19,16 @@ import MyEvents from './pages/MyEvents';
 import Footer from './components/Footer';
 import About from './pages/About';
 // import Login from './components/Login'
+import Cricket from './pages/sports/Cricket';
+import Football from './pages/sports/Football';
+import Basketball from './pages/sports/Basketball';
+import Badminton from './pages/sports/Badminton';
+
 const App = () => {
   return (
     <>
       <Navbar />
-      {/* Add margin-top to account for fixed navbar */}
-      <div className="pt-16">
+      <div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -44,6 +48,10 @@ const App = () => {
           <Route path="/events" element={<AllEventsPage />} />
           <Route path="/my-events" element={<MyEvents />} />
           <Route path="/about" element={<About />} />
+          <Route path="/sports/cricket" element={<Cricket />} />
+          <Route path="/sports/football" element={<Football />} />
+          <Route path="/sports/basketball" element={<Basketball />} />
+          <Route path="/sports/badminton" element={<Badminton />} />
         </Routes>
       </div>
       <Footer />
