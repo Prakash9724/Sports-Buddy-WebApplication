@@ -3,6 +3,7 @@ import Slidebar from "../components/Slidebar";
 import { Users, CalendarDays, Trophy, TrendingUp, Activity, MapPin } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -15,6 +16,7 @@ const AdminDashboard = () => {
   });
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -22,7 +24,12 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        navigate('/admin/login');
+        return;
+      }
+
       const response = await fetch('http://localhost:4000/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -32,6 +39,10 @@ const AdminDashboard = () => {
       if (data.success) {
         setStats(data.stats);
         setRecentActivities(data.recentActivities);
+      } else {
+        if (response.status === 401) {
+          navigate('/admin/login');
+        }
       }
     } catch (error) {
       console.error('Error:', error);

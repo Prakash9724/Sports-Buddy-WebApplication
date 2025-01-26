@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -11,10 +11,18 @@ import {
   Trophy,
   Bell,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const Slidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminToken');
+    toast.success('Admin logged out successfully');
+    navigate('/admin/login');
+  };
 
   const menuItems = [
     {
@@ -100,14 +108,11 @@ const Slidebar = () => {
             </div>
           </Link>
         ))}
-      </div>
 
-      {/* Logout Button */}
-      <div className="absolute bottom-0 w-full p-4 border-t">
+        {/* Logout Button */}
         <button
-          className={`flex items-center ${
-            isExpanded ? "w-full" : "justify-center"
-          } px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors`}
+          onClick={handleAdminLogout}
+          className="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors"
         >
           <LogOut size={24} />
           {isExpanded && <span className="ml-3 font-medium">Logout</span>}

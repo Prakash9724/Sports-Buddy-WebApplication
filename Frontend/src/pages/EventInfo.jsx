@@ -53,7 +53,7 @@ const EventInfo = () => {
 
   const handleRegistration = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('userToken');
       if (!token) {
         toast.error('Please login first');
         navigate('/login');
@@ -72,9 +72,12 @@ const EventInfo = () => {
       
       if (data.success) {
         setIsRegistered(true);
-        setEvent(data.event); // Update event with latest data
+        setEvent(data.event);
         toast.success('Registration successful! 🎉');
       } else {
+        if (response.status === 401) {
+          navigate('/login');
+        }
         toast.error(data.message || 'Registration failed');
       }
     } catch (error) {

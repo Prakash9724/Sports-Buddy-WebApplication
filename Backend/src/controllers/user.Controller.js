@@ -96,9 +96,9 @@ exports.loginUser = async (req, res) => {
         // Generate JWT token with user ID and role
         const token = jwt.sign(
             { 
-                _id: user._id, // Changed from userId to _id
+                _id: user._id,
                 email: user.email,
-                role: 'user'  // Add role for user
+                role: 'user'
             },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
@@ -108,6 +108,7 @@ exports.loginUser = async (req, res) => {
             success: true,
             message: "Login successful ho gaya",
             token,
+            tokenKey: 'userToken',
             user: {
                 firstName: user.firstName,
                 lastName: user.lastName,

@@ -9,12 +9,12 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const userToken = localStorage.getItem('userToken');
+    setIsLoggedIn(!!userToken);
   }, [location]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('userToken');
     setIsLoggedIn(false);
     navigate('/');
   };

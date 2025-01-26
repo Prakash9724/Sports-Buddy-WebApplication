@@ -45,7 +45,7 @@ const EventForm = () => {
 
   const fetchEventDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await fetch(`http://localhost:4000/api/admin/events/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -62,6 +62,9 @@ const EventForm = () => {
         setFormData(eventData);
       } else {
         toast.error('Failed to fetch event details');
+        if (response.status === 401 || response.status === 403) {
+          navigate('/admin/login');
+        }
       }
     } catch (error) {
       console.error('Error fetching event:', error);
@@ -114,7 +117,12 @@ const EventForm = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        navigate('/admin/login');
+        return;
+      }
+
       const formDataToSend = new FormData();
       
       // Filter out participants field if it's empty
@@ -152,6 +160,9 @@ const EventForm = () => {
         navigate('/admin/events');
       } else {
         toast.error(data.message);
+        if (response.status === 401 || response.status === 403) {
+          navigate('/admin/login');
+        }
       }
     } catch (error) {
       console.error('Error:', error);

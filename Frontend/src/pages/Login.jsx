@@ -24,7 +24,7 @@ const Login = () => {
       const data = await response.json();
       
       if (data.success) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem(data.tokenKey || 'token', data.token);
         toast.success('Login successful!');
         navigate('/dashboard');
       } else {

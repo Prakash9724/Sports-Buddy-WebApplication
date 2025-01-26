@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import Slidebar from '../components/Slidebar';
-import { Edit, Trash2, Eye, X } from 'lucide-react';
+import { Edit, Trash2, Eye, X, Users } from 'lucide-react';
 
 const AdminEventsList = () => {
   const [events, setEvents] = useState([]);
@@ -18,7 +18,7 @@ const AdminEventsList = () => {
 
   const fetchEvents = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       if (!token) {
         toast.error('Please login first');
         return;
@@ -57,7 +57,7 @@ const AdminEventsList = () => {
   const handleDeleteEvent = async (eventId) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const response = await fetch(`http://localhost:4000/api/admin/events/${eventId}`, {
           method: 'DELETE',
           headers: {
@@ -81,7 +81,7 @@ const AdminEventsList = () => {
 
   const fetchParticipants = async (eventId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const response = await fetch(`http://localhost:4000/api/admin/events/${eventId}/participants`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -122,7 +122,7 @@ const AdminEventsList = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Events Management</h1>
             <Link
-              to="/events-form"
+              to="/admin/events-form"
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               Create New Event
@@ -181,13 +181,13 @@ const AdminEventsList = () => {
 
                   <div className="mt-4 flex justify-end space-x-2">
                     <Link
-                      to={`/event/${event._id}`}
+                      to={`/admin/event/${event._id}`}
                       className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
                     >
                       <Eye size={20} />
                     </Link>
                     <Link
-                      to={`/edit-event/${event._id}`}
+                      to={`/admin/edit-event/${event._id}`}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                     >
                       <Edit size={20} />
@@ -197,6 +197,12 @@ const AdminEventsList = () => {
                       className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                     >
                       <Trash2 size={20} />
+                    </button>
+                    <button
+                      onClick={() => fetchParticipants(event._id)}
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                    >
+                      <Users size={20} />
                     </button>
                   </div>
                 </div>

@@ -45,7 +45,7 @@ const Dashboard = () => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('userToken');
         if (!token) {
           navigate('/login');
           return;

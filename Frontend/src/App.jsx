@@ -27,47 +27,46 @@ import Badminton from './pages/sports/Badminton';
 const App = () => {
   return (
     <>
-      
-
-      <div>
-        <Routes>
+      <Routes>
         {/* Admin Routes */}
-        
-        <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/events" element={<AdminEventsList />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/events-form" element={<EventForm />} />
-          <Route path="/edit-event/:id" element={<EventForm />} />
-          <Route path="/event/:id" element={<EventInfo />} />
-        </Routes>
-      </div>
-    <div>
-    <Navbar />
-      <div className="pt-16">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          
-       
-          
-          
-          {/* Public Routes */}
-          <Route path="/events" element={<AllEventsPage />} />
-          <Route path="/my-events" element={<MyEvents />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/sports/cricket" element={<Cricket />} />
-          <Route path="/sports/football" element={<Football />} />
-          <Route path="/sports/basketball" element={<Basketball />} />
-          <Route path="/sports/badminton" element={<Badminton />} />
-        </Routes>
-      </div>
-    </div>
+        <Route path="/admin/*" element={
+          <div className="min-h-screen">
+            <Routes>
+              <Route path="login" element={<AdminLogin />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="events" element={<AdminEventsList />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="events-form" element={<EventForm />} />
+              <Route path="edit-event/:id" element={<EventForm />} />
+              <Route path="event/:id" element={<EventInfo />} />
+            </Routes>
+          </div>
+        } />
 
-     
-      <Footer />
+        {/* User Routes */}
+        <Route path="/*" element={
+          <div>
+            <Navbar />
+            <div className="pt-16">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="events" element={<AllEventsPage />} />
+                <Route path="event/:id" element={<EventInfo />} />
+                <Route path="my-events" element={<MyEvents />} />
+                <Route path="about" element={<About />} />
+                <Route path="sports/cricket" element={<Cricket />} />
+                <Route path="sports/football" element={<Football />} />
+                <Route path="sports/basketball" element={<Basketball />} />
+                <Route path="sports/badminton" element={<Badminton />} />
+              </Routes>
+            </div>
+            <Footer />
+          </div>
+        } />
+      </Routes>
     </>
   );
 };

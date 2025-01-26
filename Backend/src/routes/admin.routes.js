@@ -34,7 +34,10 @@ router.post('/login', async (req, res) => {
 
         // Generate token with admin role
         const token = jwt.sign(
-            { role: 'admin' },
+            { 
+                role: 'admin',
+                email: process.env.ADMIN_EMAIL
+            },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
@@ -42,7 +45,8 @@ router.post('/login', async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Admin login successful",
-            token
+            token,
+            tokenKey: 'adminToken'
         });
 
     } catch (error) {

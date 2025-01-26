@@ -32,7 +32,7 @@ const AdminLogin = () => {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem(data.tokenKey || 'adminToken', data.token);
         toast.success('Admin login successful!');
         navigate('/admin/dashboard');
       } else {
