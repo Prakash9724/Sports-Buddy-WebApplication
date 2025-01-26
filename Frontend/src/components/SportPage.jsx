@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar, MapPin, Trophy, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 
 const SportPage = ({ sport }) => {
   const sportsData = {
@@ -222,9 +223,19 @@ const SportPage = ({ sport }) => {
 
   const currentSport = sportsData[sport];
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (!currentSport) {
+    return <div>Sport not found</div>;
+  }
+
+
+
   return (
     <main className="mt-0">
-      <section className="-mt-16 relative">
+      <section className="relative">
         <div className="h-screen relative">
           <motion.div 
             initial={{ scale: 1.2 }}
