@@ -46,8 +46,16 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       });
     }
 
+    // Check if event is active
+    if (event.status !== 'active') {
+      return res.status(400).json({
+        success: false,
+        message: 'Event active nahi hai'
+      });
+    }
+
     // Get user ID from token
-    const user = await User.findById(req.user._id); // Use _id from token
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -64,7 +72,11 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
     }
 
     // Check if user is already registered
-    if (event.participants.includes(user._id)) {
+    const isRegistered = event.participants.some(participantId => 
+      participantId.toString() === user._id.toString()
+    );
+
+    if (isRegistered) {
       return res.status(400).json({
         success: false,
         message: 'Aap pehle se registered ho'
@@ -73,22 +85,26 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
 
     // Add user to event participants
     event.participants.push(user._id);
-    event.currentParticipants += 1;
+    event.currentParticipants = event.participants.length;
     await event.save();
 
-    // Add event to user's registered events
-    user.registeredEvents.push(event._id);
-    await user.save();
+    // Add event to user's registered events if not already added
+    if (!user.registeredEvents.includes(event._id)) {
+      user.registeredEvents.push(event._id);
+      await user.save();
+    }
 
     res.status(200).json({
       success: true,
-      message: 'Registration successful ho gaya'
+      message: 'Registration successful ho gaya',
+      event: event
     });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Registration mein error aaya'
+      message: 'Registration mein error aaya',
+      error: error.message
     });
   }
 });

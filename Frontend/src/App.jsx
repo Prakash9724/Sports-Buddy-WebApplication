@@ -27,7 +27,23 @@ import Badminton from './pages/sports/Badminton';
 const App = () => {
   return (
     <>
-      <Navbar />
+      
+
+      <div>
+        <Routes>
+        {/* Admin Routes */}
+        
+        <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/events" element={<AdminEventsList />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/events-form" element={<EventForm />} />
+          <Route path="/edit-event/:id" element={<EventForm />} />
+          <Route path="/event/:id" element={<EventInfo />} />
+        </Routes>
+      </div>
+    <div>
+    <Navbar />
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -35,14 +51,8 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/events" element={<AdminEventsList />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/events-form" element={<EventForm />} />
-          <Route path="/edit-event/:id" element={<EventForm />} />
-          <Route path="/event/:id" element={<EventInfo />} />
+       
+          
           
           {/* Public Routes */}
           <Route path="/events" element={<AllEventsPage />} />
@@ -54,6 +64,9 @@ const App = () => {
           <Route path="/sports/badminton" element={<Badminton />} />
         </Routes>
       </div>
+    </div>
+
+     
       <Footer />
     </>
   );

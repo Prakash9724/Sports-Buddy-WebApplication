@@ -12,6 +12,7 @@ const EventInfo = () => {
 
   useEffect(() => {
     fetchEventDetails();
+    checkRegistrationStatus();
   }, [id]);
 
   const fetchEventDetails = async () => {
@@ -30,6 +31,23 @@ const EventInfo = () => {
       toast.error('Event load nahi ho paya');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkRegistrationStatus = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/events/${id}`);
+      const data = await response.json();
+      
+      if (data.success && data.event) {
+        const userId = JSON.parse(atob(token.split('.')[1]))._id;
+        setIsRegistered(data.event.participants.includes(userId));
+      }
+    } catch (error) {
+      console.error('Error checking registration status:', error);
     }
   };
 
@@ -54,9 +72,8 @@ const EventInfo = () => {
       
       if (data.success) {
         setIsRegistered(true);
+        setEvent(data.event); // Update event with latest data
         toast.success('Registration successful! 🎉');
-        // Refresh event details
-        fetchEventDetails();
       } else {
         toast.error(data.message || 'Registration failed');
       }
