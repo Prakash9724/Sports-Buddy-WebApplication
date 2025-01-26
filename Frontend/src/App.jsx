@@ -28,7 +28,7 @@ const App = () => {
   return (
     <>
       <Navbar />
-      <div>
+      <div className="pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

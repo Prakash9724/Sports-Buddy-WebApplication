@@ -13,9 +13,10 @@ const SportPage = ({ sport }) => {
       intro: "Cricket isn't just a sport in India, it's an emotion that brings millions together. Whether you're a batsman, bowler, or just love the game, find your perfect match here.",
       history: "Cricket originated in England in the 16th century and has evolved into one of the world's most popular sports, especially in Commonwealth nations.",
       legendaryPlayers: [
+        { name: "Ms Dhoni", achievement: "Only Captain to win all three ICC trophies" },
         { name: "Virat Kohli", achievement: "Modern era batting legend" },
         { name: "Sachin Tendulkar", achievement: "100 International centuries" },
-        { name: "Don Bradman", achievement: "Test batting average of 99.94" },
+        
         
       ],
       facts: [
