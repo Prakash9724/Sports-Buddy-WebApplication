@@ -62,15 +62,15 @@ const Home = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  to="/register"
-                  className="btn-primary"
+                  to="/events"
+                  className="btn-primary text-white"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link
                   to="/events"
-                  className="btn-secondary"
+                  className="btn-secondary text-white"
                 >
                   Explore Events
                 </Link>

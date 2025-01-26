@@ -9,6 +9,7 @@ const MyEvents = () => {
 
   useEffect(() => {
     fetchMyEvents();
+    window.scrollTo(0, 0);
   }, []);
 
   const fetchMyEvents = async () => {

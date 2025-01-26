@@ -196,7 +196,7 @@ const Dashboard = () => {
             </div>
 
             {/* Tab Content with Cards */}
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-gray-50 rounded-xl p-6 ">
               {activeTab === 'personal' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
