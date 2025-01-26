@@ -41,20 +41,11 @@ const Slidebar = () => {
       path: "/admin/events",
     },
     {
-      title: "Sports",
-      icon: <Trophy size={24} />,
-      path: "/admin-dashboard/sports",
-    },
-    {
       title: "Notifications",
       icon: <Bell size={24} />,
-      path: "/admin-dashboard/notifications",
+      path: "/admin/events",
     },
-    {
-      title: "Settings",
-      icon: <Settings size={24} />,
-      path: "/admin-dashboard/settings",
-    },
+    
   ];
 
   return (
