@@ -11,6 +11,7 @@ const AllEventsPage = () => {
 
   useEffect(() => {
     fetchEvents();
+    window.scrollTo(0, 0);
   }, []);
 
   const fetchEvents = async () => {
