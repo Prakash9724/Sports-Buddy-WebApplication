@@ -34,7 +34,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
               <img src="/images/logo.png" alt="SportsBuddy" className="h-10 w-auto" />
-              <span className="text-xl font-bold text-white"> SportsBuddy</span>
+              <span className="text-xl font-bold text-white">SportsBuddy</span>
             </Link>
             <p className="text-gray-400">
               Connecting sports enthusiasts and creating active communities.
