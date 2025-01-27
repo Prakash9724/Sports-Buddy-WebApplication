@@ -40,11 +40,11 @@ const Slidebar = () => {
       icon: <CalendarDays size={24} />,
       path: "/admin/events",
     },
-    {
-      title: "Notifications",
-      icon: <Bell size={24} />,
-      path: "/admin/events",
-    },
+    // {
+    //   title: "Notifications",
+    //   icon: <Bell size={24} />,
+    //   path: "/admin/events",
+    // },
     
   ];
 

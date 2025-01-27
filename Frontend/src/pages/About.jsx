@@ -36,9 +36,9 @@ const About = () => {
       skills: ["Full Stack Development", "UI/UX Design", "Sports Enthusiast"],
       achievements: ["100+ Events Created", "1000+ Active Users", "50+ Sports Communities"],
       social: {
-        github: "https://github.com/your-github",
-        linkedin: "https://linkedin.com/in/your-linkedin",
-        twitter: "https://twitter.com/your-twitter"
+        github: "https://github.com/Prakash9724",
+        linkedin: "https://www.linkedin.com/in/prakash-patel-webdev?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+        twitter: "#"
       }
     }
   ];

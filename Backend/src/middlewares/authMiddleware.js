@@ -4,38 +4,27 @@ const User = require('../models/user.model');
 // User authentication middleware
 exports.authenticateUser = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
+        // Get token from header
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({
+                success: false,
+                message: "Authorization header missing ya invalid hai"
+            });
+        }
+
+        // Extract token
+        const token = authHeader.split(' ')[1];
         
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Please login first"
-            });
-        }
-
+        // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Check if it's an admin token
-        if (decoded.role === 'admin') {
-            req.user = { role: 'admin' };
-            return next();
-        }
-
-        // For regular users, verify in database
-        const user = await User.findById(decoded._id).select('-password');
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        req.user = user;
+        
+        // Add user to request
+        req.user = decoded;
         next();
-
     } catch (error) {
         console.error("Authentication mein error:", error);
-        res.status(401).json({
+        return res.status(401).json({
             success: false,
             message: "Authentication failed"
         });

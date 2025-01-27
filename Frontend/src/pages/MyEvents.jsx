@@ -14,7 +14,7 @@ const MyEvents = () => {
 
   const fetchMyEvents = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('userToken');
       const response = await fetch('http://localhost:4000/api/users/registered-events', {
         headers: {
           'Authorization': `Bearer ${token}`

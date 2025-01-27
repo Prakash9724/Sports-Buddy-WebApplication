@@ -19,10 +19,10 @@ const Footer = () => {
       { name: 'Badminton', path: '/sports/badminton' }
     ],
     social: [
-      { icon: <Facebook className="h-5 w-5" />, path: 'https://facebook.com' },
-      { icon: <Twitter className="h-5 w-5" />, path: 'https://twitter.com' },
-      { icon: <Instagram className="h-5 w-5" />, path: 'https://instagram.com' },
-      { icon: <Youtube className="h-5 w-5" />, path: 'https://youtube.com' }
+      { icon: <Facebook className="h-5 w-5" />, path: '#' },
+      { icon: <Twitter className="h-5 w-5" />, path: '#' },
+      { icon: <Instagram className="h-5 w-5" />, path: '#' },
+      { icon: <Youtube className="h-5 w-5" />, path: '#' }
     ]
   };
 
