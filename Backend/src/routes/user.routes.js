@@ -11,6 +11,7 @@ const {
     updateProfile, 
     changePassword 
 } = require('../controllers/user.Controller');
+const Event = require('../models/event.model');
 
 // Public routes
 router.post('/register', registerUser);
@@ -91,6 +92,62 @@ router.put('/sports-preferences', authenticateUser, async (req, res) => {
       message: "Update karne mein problem hui"
     });
   }
+});
+
+// Add this route for event registration
+router.put('/register-event', authenticateUser, async (req, res) => {
+    try {
+        const { eventId } = req.body;
+        const userId = req.user._id;
+
+        // Find user and event
+        const user = await User.findById(userId);
+        const event = await Event.findById(eventId);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: "Event nahi mila"
+            });
+        }
+
+        // Check if already registered
+        if (user.registeredEvents.includes(eventId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Aap is event mein pehle se registered hain"
+            });
+        }
+
+        // Check if event is full
+        if (event.currentParticipants >= event.maxParticipants) {
+            return res.status(400).json({
+                success: false,
+                message: "Event full ho gaya hai"
+            });
+        }
+
+        // Register user for event
+        user.registeredEvents.push(eventId);
+        await user.save();
+
+        // Update event participants
+        event.currentParticipants += 1;
+        await event.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Event mein registration ho gaya",
+            event
+        });
+
+    } catch (error) {
+        console.error("Event registration error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Registration mein kuch gadbad ho gayi"
+        });
+    }
 });
 
 module.exports = router;

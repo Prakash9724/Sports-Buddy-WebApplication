@@ -4,29 +4,54 @@ const User = require('../models/user.model');
 // User authentication middleware
 exports.authenticateUser = async (req, res, next) => {
     try {
-        // Get token from header
+        // Get token from header with better error handling
         const authHeader = req.headers.authorization;
+        
+        console.log('Auth Header:', authHeader); // Debug log
+
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({
                 success: false,
-                message: "Authorization header missing ya invalid hai"
+                message: "Token missing hai ya invalid format hai"
             });
         }
 
-        // Extract token
+        // Extract token and verify
         const token = authHeader.split(' ')[1];
         
-        // Verify token
+        console.log('Extracted token:', token); // Debug log
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: "Token missing hai"
+            });
+        }
+
+        // Verify token with proper JWT_SECRET
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
+        console.log('Decoded token:', decoded); // Debug log
+
+        // Get user from database
+        const user = await User.findById(decoded._id);
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
         // Add user to request
-        req.user = decoded;
+        req.user = user;
         next();
+
     } catch (error) {
-        console.error("Authentication mein error:", error);
+        console.error("Authentication error details:", error);
         return res.status(401).json({
             success: false,
-            message: "Authentication failed"
+            message: "Authentication failed. Please login again.",
+            error: error.message
         });
     }
 };

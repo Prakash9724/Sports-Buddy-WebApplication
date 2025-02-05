@@ -11,47 +11,42 @@ const EventInfo = () => {
   const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:4000/api/events/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setEvent(data.event);
+          // Check registration status
+          const token = localStorage.getItem('userToken');
+          if (token) {
+            const regResponse = await fetch(`http://localhost:4000/api/users/registered-events`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            const regData = await regResponse.json();
+            if (regData.success) {
+              setIsRegistered(regData.events.some(e => e._id === id));
+            }
+          }
+        } else {
+          toast.error('Event not found');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Failed to load event details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchEventDetails();
-    checkRegistrationStatus();
   }, [id]);
 
-  const fetchEventDetails = async () => {
-    try {
-      const response = await fetch(`http://localhost:4000/api/events/${id}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        console.log("Event data:", data.event); // Debug log
-        setEvent(data.event);
-      } else {
-        toast.error('Event details nahi mil paye');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Event load nahi ho paya');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkRegistrationStatus = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    try {
-      const response = await fetch(`http://localhost:4000/api/events/${id}`);
-      const data = await response.json();
-      
-      if (data.success && data.event) {
-        const userId = JSON.parse(atob(token.split('.')[1]))._id;
-        setIsRegistered(data.event.participants.includes(userId));
-      }
-    } catch (error) {
-      console.error('Error checking registration status:', error);
-    }
-  };
-
-  const handleRegistration = async () => {
+  const handleRegister = async () => {
     try {
       const token = localStorage.getItem('userToken');
       if (!token) {
@@ -60,35 +55,37 @@ const EventInfo = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:4000/api/events/${id}/register`, {
-        method: 'POST',
+      const response = await fetch('http://localhost:4000/api/users/register-event', {
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ eventId: id })
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
+        toast.success('Event registration successful!');
         setIsRegistered(true);
-        setEvent(data.event);
-        toast.success('Registration successful! 🎉');
+        // Update participants count
+        setEvent(prev => ({
+          ...prev,
+          currentParticipants: (prev.currentParticipants || 0) + 1
+        }));
       } else {
-        if (response.status === 401) {
-          navigate('/login');
-        }
         toast.error(data.message || 'Registration failed');
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Registration failed. Please try again.');
+      console.error('Registration error:', error);
+      toast.error('Registration failed');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -96,8 +93,17 @@ const EventInfo = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Event not found 😢</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800">Event Not Found</h2>
+          <p className="text-gray-600 mt-2">The event you're looking for doesn't exist.</p>
+          <button 
+            onClick={() => navigate('/events')}
+            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            View All Events
+          </button>
+        </div>
       </div>
     );
   }
@@ -149,7 +155,7 @@ const EventInfo = () => {
               {/* Registration Button */}
               <div className="mt-6">
                 <button
-                  onClick={handleRegistration}
+                  onClick={handleRegister}
                   disabled={isRegistered || event?.currentParticipants >= event?.maxParticipants}
                   className={`w-full py-3 px-4 rounded-lg font-medium text-center ${
                     isRegistered 
