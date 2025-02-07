@@ -5,22 +5,31 @@ import { Dialog } from '@headlessui/react';
 
 const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.personal?.phone || '',
-    gender: user?.personal?.gender || '',
-    dateOfBirth: user?.personal?.dateOfBirth ? new Date(user?.personal?.dateOfBirth).toISOString().split('T')[0] : '',
-    address: user?.personal?.address || '',
-    city: user?.personal?.city || '',
-    state: user?.personal?.state || '',
-    pincode: user?.personal?.pincode || '',
+    personal: {
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      phone: user?.personal?.phone || '',
+      gender: user?.personal?.gender || '',
+      dateOfBirth: user?.personal?.dateOfBirth ? new Date(user?.personal?.dateOfBirth).toISOString().split('T')[0] : '',
+      address: user?.personal?.address || '',
+      city: user?.personal?.city || '',
+      state: user?.personal?.state || '',
+      pincode: user?.personal?.pincode || ''
+    },
     professional: {
       occupation: user?.professional?.occupation || '',
       company: user?.professional?.company || '',
       experience: user?.professional?.experience || '',
       education: user?.professional?.education || '',
       skills: user?.professional?.skills || []
+    },
+    sportsPreferences: {
+      indoor: user?.sportsPreferences?.indoor || [],
+      outdoor: user?.sportsPreferences?.outdoor || [],
+      skillLevel: user?.sportsPreferences?.skillLevel || '',
+      availability: user?.sportsPreferences?.availability || [],
+      preferredLocations: user?.sportsPreferences?.preferredLocations || []
     }
   });
 
@@ -36,24 +45,7 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         return;
       }
 
-      // Format data for backend
-      const updateData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        personal: {
-          phone: formData.phone,
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.pincode
-        },
-        professional: formData.professional
-      };
-
-      console.log('Sending update:', updateData); // Debug log
+      console.log('Submitting data:', formData);
 
       const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
@@ -61,14 +53,13 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();
-      console.log('Server response:', data); // Debug log
+      console.log('Server response:', data);
 
       if (data.success) {
-        // Update local storage and parent component
         localStorage.setItem('userData', JSON.stringify(data.user));
         onUpdate(data.user);
         toast.success('Profile updated successfully!');
@@ -170,43 +161,49 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                 {/* Tab Content */}
                 <div className="space-y-6">
                   {activeTab === 'personal' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First Name
-                        </label>
+                        <label>First Name</label>
                         <input
                           type="text"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={(e) => handleChange('firstName', 'firstName', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.firstName}
+                          onChange={(e) => handleChange('personal', 'firstName', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label>Last Name</label>
+                        <input
+                          type="text"
+                          value={formData.personal.lastName}
+                          onChange={(e) => handleChange('personal', 'lastName', e.target.value)}
+                          className="form-input"
+                        />
+                      </div>
+                      <div>
+                        <label>Email</label>
                         <input
                           type="email"
-                          value={formData.email}
-                          onChange={(e) => handleChange('email', 'email', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.email}
+                          onChange={(e) => handleChange('personal', 'email', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <label>Phone Number</label>
                         <input
                           type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleChange('phone', 'phone', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.phone}
+                          onChange={(e) => handleChange('personal', 'phone', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                        <label>Gender</label>
                         <select
-                          value={formData.gender}
-                          onChange={(e) => handleChange('gender', 'gender', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.gender}
+                          onChange={(e) => handleChange('personal', 'gender', e.target.value)}
+                          className="form-select"
                         >
                           <option value="">Select Gender</option>
                           <option value="male">Male</option>
@@ -215,49 +212,49 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <label>Date of Birth</label>
                         <input
                           type="date"
-                          value={formData.dateOfBirth}
-                          onChange={(e) => handleChange('dateOfBirth', 'dateOfBirth', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.dateOfBirth}
+                          onChange={(e) => handleChange('personal', 'dateOfBirth', e.target.value)}
+                          className="form-input"
                           max={new Date().toISOString().split('T')[0]}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <label>Address</label>
                         <input
                           type="text"
-                          value={formData.address}
-                          onChange={(e) => handleChange('address', 'address', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.address}
+                          onChange={(e) => handleChange('personal', 'address', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <label>City</label>
                         <input
                           type="text"
-                          value={formData.city}
-                          onChange={(e) => handleChange('city', 'city', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.city}
+                          onChange={(e) => handleChange('personal', 'city', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <label>State</label>
                         <input
                           type="text"
-                          value={formData.state}
-                          onChange={(e) => handleChange('state', 'state', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.state}
+                          onChange={(e) => handleChange('personal', 'state', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                        <label>Pincode</label>
                         <input
                           type="text"
-                          value={formData.pincode}
-                          onChange={(e) => handleChange('pincode', 'pincode', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          value={formData.personal.pincode}
+                          onChange={(e) => handleChange('personal', 'pincode', e.target.value)}
+                          className="form-input"
                         />
                       </div>
                     </div>
@@ -266,39 +263,39 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                   {activeTab === 'professional' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                        <label>Occupation</label>
                         <input
                           type="text"
                           value={formData.professional.occupation}
                           onChange={(e) => handleChange('professional', 'occupation', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                        <label>Company</label>
                         <input
                           type="text"
                           value={formData.professional.company}
                           onChange={(e) => handleChange('professional', 'company', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
+                        <label>Experience</label>
                         <input
                           type="text"
                           value={formData.professional.experience}
                           onChange={(e) => handleChange('professional', 'experience', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className="form-input"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Education</label>
+                        <label>Education</label>
                         <input
                           type="text"
                           value={formData.professional.education}
                           onChange={(e) => handleChange('professional', 'education', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className="form-input"
                         />
                       </div>
                     </div>
