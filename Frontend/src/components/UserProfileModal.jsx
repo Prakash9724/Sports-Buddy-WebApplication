@@ -39,7 +39,12 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('userToken');
+      if (!token) {
+        toast.error('Please login again');
+        return;
+      }
+
       const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
         headers: {
@@ -50,17 +55,20 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
       });
 
       const data = await response.json();
+      console.log('Update response:', data); // Debug log
 
       if (data.success) {
-        toast.success('Profile update ho gaya!');
+        toast.success('Profile updated successfully!');
+        // Update local storage
+        localStorage.setItem('userData', JSON.stringify(data.user));
         onUpdate(data.user);
         onClose();
       } else {
-        toast.error(data.message || 'Update failed');
+        toast.error(data.message || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Profile update nahi ho paya');
+      console.error('Profile update error:', error);
+      toast.error('Failed to update profile');
     }
   };
 

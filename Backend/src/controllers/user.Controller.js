@@ -155,26 +155,36 @@ exports.getUserProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
     try {
-        const { personal, professional, sportsPreferences } = req.body;
+        const userId = req.user._id;
+        console.log('Update profile for user:', userId); // Debug log
 
-        // Format date if it exists
-        if (personal?.dateOfBirth) {
-            personal.dateOfBirth = new Date(personal.dateOfBirth);
-        }
+        // Fields that can be updated
+        const updates = {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            phone: req.body.phone,
+            gender: req.body.gender,
+            dateOfBirth: req.body.dateOfBirth,
+            address: req.body.address,
+            city: req.body.city,
+            state: req.body.state,
+            pincode: req.body.pincode,
+            professional: {
+                occupation: req.body.professional?.occupation,
+                company: req.body.professional?.company,
+                experience: req.body.professional?.experience,
+                education: req.body.professional?.education,
+                skills: req.body.professional?.skills
+            }
+        };
 
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $set: {
-                    personal,
-                    professional,
-                    sportsPreferences
-                }
-            },
-            { new: true }
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $set: updates },
+            { new: true, runValidators: true }
         ).select('-password');
 
-        if (!updatedUser) {
+        if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
@@ -183,14 +193,16 @@ exports.updateProfile = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "Profile update ho gaya",
-            user: updatedUser
+            message: "Profile updated successfully",
+            user
         });
+
     } catch (error) {
-        console.error("Profile update mein error:", error);
+        console.error('Profile update error:', error);
         res.status(500).json({
             success: false,
-            message: "Update karne mein problem hui"
+            message: "Failed to update profile",
+            error: error.message
         });
     }
 };
