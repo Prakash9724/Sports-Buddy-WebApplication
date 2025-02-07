@@ -40,7 +40,7 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/users/profile', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

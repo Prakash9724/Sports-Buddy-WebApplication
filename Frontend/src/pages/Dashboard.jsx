@@ -42,33 +42,40 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchDashboardData = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('userToken');
+        
         if (!token) {
           navigate('/login');
           return;
         }
 
-        const response = await fetch('http://localhost:4000/api/users/profile', {
+        const profileResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        const data = await response.json();
-        console.log("Profile data:", data); // Debug log
-
-        if (data.success) {
-          setUser(data.user);
-          // After getting user, fetch their events
-          fetchRegisteredEvents(token);
-        } else {
-          toast.error(data.message);
-          if (response.status === 401) {
-            navigate('/login');
+        const profileData = await profileResponse.json();
+        
+        if (profileData.success) {
+          setUser(profileData.user);
+          
+          // Fetch registered events
+          const eventsResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/registered-events', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          const eventsData = await eventsResponse.json();
+          if (eventsData.success) {
+            setRegisteredEvents(eventsData.events);
           }
+        } else {
+          toast.error(profileData.message);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -78,30 +85,8 @@ const Dashboard = () => {
       }
     };
 
-    fetchUserProfile();
+    fetchDashboardData();
   }, [navigate]);
-
-  const fetchRegisteredEvents = async (token) => {
-    try {
-      const response = await fetch('http://localhost:4000/api/users/registered-events', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      console.log("Events data:", data); // Debug log
-      
-      if (data.success) {
-        setRegisteredEvents(data.events || []);
-      } else {
-        toast.error(data.message || 'Events load nahi ho paye');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Events load nahi ho paye');
-    }
-  };
 
   const handleProfileUpdate = (updatedUser) => {
     setUser(updatedUser);
@@ -307,7 +292,7 @@ const Dashboard = () => {
                 >
                   <div className="aspect-video relative overflow-hidden">
                     <img 
-                      src={`http://localhost:4000${event.image}`}
+                      src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

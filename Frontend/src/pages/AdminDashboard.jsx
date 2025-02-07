@@ -30,7 +30,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/admin/dashboard', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

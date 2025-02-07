@@ -24,7 +24,7 @@ const AdminEventsList = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/admin/events', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/admin/events', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +58,7 @@ const AdminEventsList = () => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
         const token = localStorage.getItem('adminToken');
-        const response = await fetch(`http://localhost:4000/api/admin/events/${eventId}`, {
+        const response = await fetch(`https://sports-buddy-webapplication.onrender.com/api/admin/events/${eventId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -82,7 +82,7 @@ const AdminEventsList = () => {
   const fetchParticipants = async (eventId) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:4000/api/admin/events/${eventId}/participants`, {
+      const response = await fetch(`https://sports-buddy-webapplication.onrender.com/api/admin/events/${eventId}/participants`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -154,7 +154,7 @@ const AdminEventsList = () => {
               <div key={event._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="relative h-48">
                   <img
-                    src={`http://localhost:4000${event.image}`}
+                    src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
                     alt={event.title}
                     className="w-full h-full object-cover"
                   />

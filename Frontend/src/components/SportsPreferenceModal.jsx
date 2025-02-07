@@ -27,7 +27,7 @@ const SportsPreferenceModal = ({ isOpen, onClose, user, onUpdate }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/users/sports-preferences', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/sports-preferences', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ const AdminUsers = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/admin/users', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/admin/users', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

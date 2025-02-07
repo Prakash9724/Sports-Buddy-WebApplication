@@ -57,11 +57,10 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// User login controller 
+// User login controller
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        
         console.log('Login attempt for:', { email }); // Debug log
 
         // Basic validation
@@ -72,7 +71,7 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // User ko dhundo
+        // Find user
         const user = await User.findOne({ email: email.toLowerCase() });
         console.log('User found:', user ? 'Yes' : 'No'); // Debug log
 
@@ -83,44 +82,44 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // Password check karo
-        const isPasswordValid = await user.comparePassword(password);
-        
-        if (!isPasswordValid) {
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match:', isMatch); // Debug log
+
+        if (!isMatch) {
             return res.status(401).json({
                 success: false,
                 message: "Email ya password galat hai"
             });
         }
 
-        // Generate JWT token with user ID and role
+        // Create token
         const token = jwt.sign(
-            { 
-                _id: user._id,
-                email: user.email,
-                role: 'user'
-            },
+            { userId: user._id },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
+
+        // Send response without password
+        const userResponse = {
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        };
 
         res.status(200).json({
             success: true,
             message: "Login successful ho gaya",
             token,
-            tokenKey: 'userToken',
-            user: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email
-            }
+            user: userResponse
         });
 
     } catch (error) {
-        console.error("Login mein error:", error);
+        console.error('Login error:', error);
         res.status(500).json({
             success: false,
-            message: "Login karne mein problem hui",
+            message: "Server error, please try again",
             error: error.message
         });
     }

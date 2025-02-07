@@ -14,8 +14,13 @@ const {
 const Event = require('../models/event.model');
 
 // Public routes
+router.get('/check', (req, res) => {
+    res.send('Hello World');
+});
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+
+
 
 // Protected routes
 router.get('/profile', authenticateUser, getUserProfile);
@@ -146,6 +151,33 @@ router.put('/register-event', authenticateUser, async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Registration mein kuch gadbad ho gayi"
+        });
+    }
+});
+
+// Add dashboard route
+router.get('/dashboard', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .select('-password')
+            .populate('registeredEvents');
+            
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch dashboard data'
         });
     }
 });

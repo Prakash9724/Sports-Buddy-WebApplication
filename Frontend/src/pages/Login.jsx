@@ -13,7 +13,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:4000/api/users/login', {
+      console.log('Submitting:', formData); // Debug log
+
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -22,17 +24,18 @@ const Login = () => {
       });
 
       const data = await response.json();
-      
+      console.log('Login response:', data); // Debug log
+
       if (data.success) {
-        localStorage.setItem(data.tokenKey || 'token', data.token);
+        localStorage.setItem('userToken', data.token);
         toast.success('Login successful!');
         navigate('/dashboard');
       } else {
-        toast.error(data.message);
+        toast.error(data.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Login failed. Please try again.');
+      console.error('Login error:', error);
+      toast.error('Server error. Please try again.');
     }
   };
 

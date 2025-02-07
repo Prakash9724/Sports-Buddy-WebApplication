@@ -21,7 +21,7 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/admin/events', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/admin/events', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

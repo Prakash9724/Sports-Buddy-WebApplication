@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
+const errorHandler = require('./src/middlewares/errorMiddleware');
 
 // Routes import karo
 const userRoutes = require('./src/routes/user.routes');
@@ -23,13 +24,39 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB se connect karo
-mongoose.connect('mongodb://localhost:27017/event-management', {
+// MongoDB Atlas Connection
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    family: 4
 })
-.then(() => console.log("MongoDB se connect ho gaya"))
-.catch(err => console.log("MongoDB se connect karne mein error:", err));
+.then(() => {
+    console.log("MongoDB Atlas se connect ho gaya");
+    // Log the connection string (without password)
+    const sanitizedUri = process.env.MONGODB_URI.replace(
+        /mongodb\+srv:\/\/(.*):(.*)@/,
+        'mongodb+srv://$1:****@'
+    );
+    console.log('Connected to:', sanitizedUri);
+})
+.catch(err => {
+    console.error("MongoDB Atlas se connect karne mein error:", err.message);
+    process.exit(1);
+});
+
+// Connection events for monitoring
+mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected to MongoDB Atlas');
+});
+
+mongoose.connection.on('error', (err) => {
+    console.log('Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('Mongoose disconnected');
+});
 
 // Models register karo
 require('./src/models/user.model');
@@ -39,6 +66,9 @@ require('./src/models/event.model');
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
+
+// Error handling middleware (add this after all routes)
+app.use(errorHandler);
 
 // Basic route
 app.get('/', (req, res) => {

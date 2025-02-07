@@ -15,7 +15,7 @@ const MyEvents = () => {
   const fetchMyEvents = async () => {
     try {
       const token = localStorage.getItem('userToken');
-      const response = await fetch('http://localhost:4000/api/users/registered-events', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/registered-events', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -68,7 +68,7 @@ const MyEvents = () => {
                 {/* Event Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={`http://localhost:4000${event.image}`}
+                    src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
                     alt={event.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

@@ -14,7 +14,7 @@ const EventInfo = () => {
     const fetchEventDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:4000/api/events/${id}`);
+        const response = await fetch(`https://sports-buddy-webapplication.onrender.com/api/events/${id}`);
         const data = await response.json();
         
         if (data.success) {
@@ -22,7 +22,7 @@ const EventInfo = () => {
           // Check registration status
           const token = localStorage.getItem('userToken');
           if (token) {
-            const regResponse = await fetch(`http://localhost:4000/api/users/registered-events`, {
+            const regResponse = await fetch(`/api/users/registered-events`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -55,7 +55,7 @@ const EventInfo = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/users/register-event', {
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/register-event', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ const EventInfo = () => {
               {/* Event Image */}
               <div className="relative h-[400px] rounded-xl overflow-hidden mb-6">
                 <img
-                  src={`http://localhost:4000${event.image}`}
+                  src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
                   alt={event.title}
                   className="w-full h-full object-cover"
                 />

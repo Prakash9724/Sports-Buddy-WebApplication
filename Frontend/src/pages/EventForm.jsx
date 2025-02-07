@@ -46,7 +46,7 @@ const EventForm = () => {
   const fetchEventDetails = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:4000/api/admin/events/${id}`, {
+      const response = await fetch(`https://sports-buddy-webapplication.onrender.com/api/admin/events/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -142,8 +142,8 @@ const EventForm = () => {
       });
 
       const url = id 
-        ? `http://localhost:4000/api/admin/events/${id}`
-        : 'http://localhost:4000/api/admin/events';
+        ? `https://sports-buddy-webapplication.onrender.com/api/admin/events/${id}`
+        : 'https://sports-buddy-webapplication.onrender.com/api/admin/events';
 
       const response = await fetch(url, {
         method: id ? 'PUT' : 'POST',
