@@ -46,17 +46,32 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('userToken');
-        
+        const userData = localStorage.getItem('userData');
+
         if (!token) {
           navigate('/login');
           return;
         }
 
+        // Set initial user data from localStorage
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+
+        // Fetch latest user data
         const profileResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         });
+
+        if (profileResponse.status === 401) {
+          localStorage.removeItem('userToken');
+          localStorage.removeItem('userData');
+          navigate('/login');
+          return;
+        }
 
         const profileData = await profileResponse.json();
         
@@ -66,7 +81,8 @@ const Dashboard = () => {
           // Fetch registered events
           const eventsResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/registered-events', {
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             }
           });
           
@@ -79,7 +95,7 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error('Error:', error);
-        toast.error('Profile load nahi ho paya');
+        toast.error('Failed to load dashboard');
       } finally {
         setLoading(false);
       }

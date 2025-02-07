@@ -28,6 +28,7 @@ const Login = () => {
 
       if (data.success) {
         localStorage.setItem('userToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
         toast.success('Login successful!');
         navigate('/dashboard');
       } else {
