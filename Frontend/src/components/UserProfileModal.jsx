@@ -5,17 +5,17 @@ import { Dialog } from '@headlessui/react';
 
 const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
   const [formData, setFormData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
     personal: {
-      email: user?.email || '',
       phone: user?.personal?.phone || '',
       gender: user?.personal?.gender || '',
       dateOfBirth: user?.personal?.dateOfBirth ? new Date(user?.personal?.dateOfBirth).toISOString().split('T')[0] : '',
       address: user?.personal?.address || '',
       city: user?.personal?.city || '',
       state: user?.personal?.state || '',
-      pincode: user?.personal?.pincode || '',
-      firstName: user?.personal?.firstName || '',
-      lastName: user?.personal?.lastName || ''
+      pincode: user?.personal?.pincode || ''
     },
     professional: {
       occupation: user?.professional?.occupation || '',
@@ -23,13 +23,6 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
       experience: user?.professional?.experience || '',
       education: user?.professional?.education || '',
       skills: user?.professional?.skills || []
-    },
-    sportsPreferences: {
-      indoor: user?.sportsPreferences?.indoor || [],
-      outdoor: user?.sportsPreferences?.outdoor || [],
-      skillLevel: user?.sportsPreferences?.skillLevel || '',
-      availability: user?.sportsPreferences?.availability || [],
-      preferredLocations: user?.sportsPreferences?.preferredLocations || []
     }
   });
 
@@ -45,6 +38,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         return;
       }
 
+      console.log('Submitting data:', formData); // Debug log
+
       const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
         headers: {
@@ -58,12 +53,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
       console.log('Update response:', data);
 
       if (data.success) {
-        // Update local storage with new user data
         localStorage.setItem('userData', JSON.stringify(data.user));
-        
-        // Call onUpdate with the updated user data
         onUpdate(data.user);
-        
         toast.success('Profile updated successfully!');
         onClose();
       } else {
@@ -171,8 +162,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <input
                           type="text"
                           name="firstName"
-                          value={formData.personal.firstName}
-                          onChange={(e) => handleChange('personal', 'firstName', e.target.value)}
+                          value={formData.firstName}
+                          onChange={(e) => handleChange('firstName', 'firstName', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
@@ -180,8 +171,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input
                           type="email"
-                          value={formData.personal.email}
-                          onChange={(e) => handleChange('personal', 'email', e.target.value)}
+                          value={formData.email}
+                          onChange={(e) => handleChange('email', 'email', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
