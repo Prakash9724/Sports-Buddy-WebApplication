@@ -161,18 +161,32 @@ exports.updateProfile = async (req, res) => {
         console.log('Updating user:', userId);
         console.log('Update data:', updateData);
 
-        // Update user document
+        // Check if we're updating sports preferences
+        if (updateData.sportsPreferences) {
+            const updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $set: { sportsPreferences: updateData.sportsPreferences } },
+                { new: true, runValidators: true }
+            ).select('-password');
+
+            if (!updatedUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found"
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: "Profile updated successfully",
+                user: updatedUser
+            });
+        }
+
+        // For other profile updates
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            {
-                $set: {
-                    firstName: updateData.firstName,
-                    lastName: updateData.lastName,
-                    email: updateData.email,
-                    personal: updateData.personal,
-                    professional: updateData.professional
-                }
-            },
+            { $set: updateData },
             { new: true, runValidators: true }
         ).select('-password');
 
@@ -182,8 +196,6 @@ exports.updateProfile = async (req, res) => {
                 message: "User not found"
             });
         }
-
-        console.log('Updated user:', updatedUser); // Debug log
 
         res.status(200).json({
             success: true,

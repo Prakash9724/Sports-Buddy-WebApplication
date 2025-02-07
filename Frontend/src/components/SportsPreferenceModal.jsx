@@ -26,8 +26,8 @@ const SportsPreferenceModal = ({ isOpen, onClose, user, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/sports-preferences', {
+      const token = localStorage.getItem('userToken');
+      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -39,8 +39,9 @@ const SportsPreferenceModal = ({ isOpen, onClose, user, onUpdate }) => {
       const data = await response.json();
 
       if (data.success) {
-        toast.success('Sports preferences update ho gaye!');
+        localStorage.setItem('userData', JSON.stringify(data.user));
         onUpdate(data.user);
+        toast.success('Sports preferences update ho gaye!');
         onClose();
       } else {
         toast.error(data.message || 'Update failed');
