@@ -161,32 +161,30 @@ exports.updateProfile = async (req, res) => {
         console.log('Updating user:', userId);
         console.log('Update data:', updateData);
 
-        // Check if we're updating sports preferences
-        if (updateData.sportsPreferences) {
-            const updatedUser = await User.findByIdAndUpdate(
-                userId,
-                { $set: { sportsPreferences: updateData.sportsPreferences } },
-                { new: true, runValidators: true }
-            ).select('-password');
+        // Create update object based on what's being updated
+        let updateObject = {};
 
-            if (!updatedUser) {
-                return res.status(404).json({
-                    success: false,
-                    message: "User not found"
-                });
-            }
-
-            return res.status(200).json({
-                success: true,
-                message: "Profile updated successfully",
-                user: updatedUser
-            });
+        // Handle personal details
+        if (updateData.personal) {
+            updateObject.personal = updateData.personal;
+            updateObject.firstName = updateData.personal.firstName;
+            updateObject.lastName = updateData.personal.lastName;
+            updateObject.email = updateData.personal.email;
         }
 
-        // For other profile updates
+        // Handle professional details
+        if (updateData.professional) {
+            updateObject.professional = updateData.professional;
+        }
+
+        // Handle sports preferences
+        if (updateData.sportsPreferences) {
+            updateObject.sportsPreferences = updateData.sportsPreferences;
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { $set: updateData },
+            { $set: updateObject },
             { new: true, runValidators: true }
         ).select('-password');
 
@@ -196,6 +194,8 @@ exports.updateProfile = async (req, res) => {
                 message: "User not found"
             });
         }
+
+        console.log('Updated user:', updatedUser); // Debug log
 
         res.status(200).json({
             success: true,
