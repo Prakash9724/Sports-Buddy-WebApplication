@@ -156,45 +156,39 @@ exports.getUserProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
-        console.log('Update profile for user:', userId); // Debug log
+        const updateData = req.body;
+        
+        console.log('Updating user:', userId);
+        console.log('Update data:', updateData);
 
-        // Fields that can be updated
-        const updates = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            phone: req.body.phone,
-            gender: req.body.gender,
-            dateOfBirth: req.body.dateOfBirth,
-            address: req.body.address,
-            city: req.body.city,
-            state: req.body.state,
-            pincode: req.body.pincode,
-            professional: {
-                occupation: req.body.professional?.occupation,
-                company: req.body.professional?.company,
-                experience: req.body.professional?.experience,
-                education: req.body.professional?.education,
-                skills: req.body.professional?.skills
-            }
-        };
-
-        const user = await User.findByIdAndUpdate(
+        // Update user document
+        const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { $set: updates },
+            {
+                $set: {
+                    firstName: updateData.firstName,
+                    lastName: updateData.lastName,
+                    email: updateData.email,
+                    personal: updateData.personal,
+                    professional: updateData.professional
+                }
+            },
             { new: true, runValidators: true }
         ).select('-password');
 
-        if (!user) {
+        if (!updatedUser) {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
         }
 
+        console.log('Updated user:', updatedUser); // Debug log
+
         res.status(200).json({
             success: true,
             message: "Profile updated successfully",
-            user
+            user: updatedUser
         });
 
     } catch (error) {

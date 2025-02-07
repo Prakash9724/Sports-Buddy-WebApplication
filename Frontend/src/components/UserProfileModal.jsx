@@ -8,15 +8,13 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
-    personal: {
-      phone: user?.personal?.phone || '',
-      gender: user?.personal?.gender || '',
-      dateOfBirth: user?.personal?.dateOfBirth ? new Date(user?.personal?.dateOfBirth).toISOString().split('T')[0] : '',
-      address: user?.personal?.address || '',
-      city: user?.personal?.city || '',
-      state: user?.personal?.state || '',
-      pincode: user?.personal?.pincode || ''
-    },
+    phone: user?.personal?.phone || '',
+    gender: user?.personal?.gender || '',
+    dateOfBirth: user?.personal?.dateOfBirth ? new Date(user?.personal?.dateOfBirth).toISOString().split('T')[0] : '',
+    address: user?.personal?.address || '',
+    city: user?.personal?.city || '',
+    state: user?.personal?.state || '',
+    pincode: user?.personal?.pincode || '',
     professional: {
       occupation: user?.professional?.occupation || '',
       company: user?.professional?.company || '',
@@ -38,7 +36,24 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         return;
       }
 
-      console.log('Submitting data:', formData); // Debug log
+      // Format data for backend
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        personal: {
+          phone: formData.phone,
+          gender: formData.gender,
+          dateOfBirth: formData.dateOfBirth,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode
+        },
+        professional: formData.professional
+      };
+
+      console.log('Sending update:', updateData); // Debug log
 
       const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
@@ -46,13 +61,14 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(updateData)
       });
 
       const data = await response.json();
-      console.log('Update response:', data);
+      console.log('Server response:', data); // Debug log
 
       if (data.success) {
+        // Update local storage and parent component
         localStorage.setItem('userData', JSON.stringify(data.user));
         onUpdate(data.user);
         toast.success('Profile updated successfully!');
@@ -180,16 +196,16 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
                           type="tel"
-                          value={formData.personal.phone}
-                          onChange={(e) => handleChange('personal', 'phone', e.target.value)}
+                          value={formData.phone}
+                          onChange={(e) => handleChange('phone', 'phone', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                         <select
-                          value={formData.personal.gender}
-                          onChange={(e) => handleChange('personal', 'gender', e.target.value)}
+                          value={formData.gender}
+                          onChange={(e) => handleChange('gender', 'gender', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         >
                           <option value="">Select Gender</option>
@@ -202,8 +218,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                         <input
                           type="date"
-                          value={formData.personal.dateOfBirth}
-                          onChange={(e) => handleChange('personal', 'dateOfBirth', e.target.value)}
+                          value={formData.dateOfBirth}
+                          onChange={(e) => handleChange('dateOfBirth', 'dateOfBirth', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                           max={new Date().toISOString().split('T')[0]}
                         />
@@ -212,8 +228,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                         <input
                           type="text"
-                          value={formData.personal.address}
-                          onChange={(e) => handleChange('personal', 'address', e.target.value)}
+                          value={formData.address}
+                          onChange={(e) => handleChange('address', 'address', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
@@ -221,8 +237,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                         <input
                           type="text"
-                          value={formData.personal.city}
-                          onChange={(e) => handleChange('personal', 'city', e.target.value)}
+                          value={formData.city}
+                          onChange={(e) => handleChange('city', 'city', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
@@ -230,8 +246,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                         <input
                           type="text"
-                          value={formData.personal.state}
-                          onChange={(e) => handleChange('personal', 'state', e.target.value)}
+                          value={formData.state}
+                          onChange={(e) => handleChange('state', 'state', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
@@ -239,8 +255,8 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
                         <input
                           type="text"
-                          value={formData.personal.pincode}
-                          onChange={(e) => handleChange('personal', 'pincode', e.target.value)}
+                          value={formData.pincode}
+                          onChange={(e) => handleChange('pincode', 'pincode', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
