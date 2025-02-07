@@ -55,13 +55,16 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
       });
 
       const data = await response.json();
-      console.log('Update response:', data); // Debug log
+      console.log('Update response:', data);
 
       if (data.success) {
-        toast.success('Profile updated successfully!');
-        // Update local storage
+        // Update local storage with new user data
         localStorage.setItem('userData', JSON.stringify(data.user));
+        
+        // Call onUpdate with the updated user data
         onUpdate(data.user);
+        
+        toast.success('Profile updated successfully!');
         onClose();
       } else {
         toast.error(data.message || 'Failed to update profile');

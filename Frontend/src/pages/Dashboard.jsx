@@ -105,7 +105,11 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleProfileUpdate = (updatedUser) => {
+    console.log('Updating user in dashboard:', updatedUser); // Debug log
     setUser(updatedUser);
+    
+    // Also update userData in localStorage
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
   };
 
   const handleSportsUpdate = (updatedUser) => {
@@ -344,6 +348,7 @@ const Dashboard = () => {
       
       {/* Profile Update Modal */}
       <UserProfileModal
+        key={user?._id}
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
         user={user}
