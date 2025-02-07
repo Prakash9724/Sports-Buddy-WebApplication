@@ -35,6 +35,9 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
 
   const [activeTab, setActiveTab] = useState('personal');
   const [skillInput, setSkillInput] = useState('');
+  const [sportInput, setSportInput] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+  const [availabilityInput, setAvailabilityInput] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         return;
       }
 
-      console.log('Submitting data:', formData);
+      console.log('Submitting data with sports preferences:', formData);
 
       const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
         method: 'PUT',
@@ -106,6 +109,60 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
     }));
   };
 
+  const handleSportsChange = (type, value) => {
+    setFormData(prev => ({
+      ...prev,
+      sportsPreferences: {
+        ...prev.sportsPreferences,
+        [type]: value
+      }
+    }));
+  };
+
+  const handleAddIndoorSport = () => {
+    if (sportInput.trim() && !formData.sportsPreferences.indoor.includes(sportInput.trim())) {
+      handleSportsChange('indoor', [...formData.sportsPreferences.indoor, sportInput.trim()]);
+      setSportInput('');
+    }
+  };
+
+  const handleAddOutdoorSport = () => {
+    if (sportInput.trim() && !formData.sportsPreferences.outdoor.includes(sportInput.trim())) {
+      handleSportsChange('outdoor', [...formData.sportsPreferences.outdoor, sportInput.trim()]);
+      setSportInput('');
+    }
+  };
+
+  const handleRemoveSport = (type, sportToRemove) => {
+    handleSportsChange(type, formData.sportsPreferences[type].filter(sport => sport !== sportToRemove));
+  };
+
+  const handleAddLocation = () => {
+    if (locationInput.trim() && !formData.sportsPreferences.preferredLocations.includes(locationInput.trim())) {
+      handleSportsChange('preferredLocations', [...formData.sportsPreferences.preferredLocations, locationInput.trim()]);
+      setLocationInput('');
+    }
+  };
+
+  const handleRemoveLocation = (location) => {
+    handleSportsChange('preferredLocations', 
+      formData.sportsPreferences.preferredLocations.filter(loc => loc !== location)
+    );
+  };
+
+  const handleAddAvailability = () => {
+    if (availabilityInput.trim() && !formData.sportsPreferences.availability.includes(availabilityInput.trim())) {
+      handleSportsChange('availability', [...formData.sportsPreferences.availability, availabilityInput.trim()]);
+      setAvailabilityInput('');
+    }
+  };
+
+  const handleRemoveAvailability = (time) => {
+    handleSportsChange('availability', 
+      formData.sportsPreferences.availability.filter(t => t !== time)
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -135,7 +192,7 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
             {/* Tabs - Visible on all screens */}
             <div className="border-b border-gray-200">
               <div className="flex space-x-8 px-6">
-                {['personal', 'professional', 'skills'].map((tab) => (
+                {['personal', 'professional', 'skills', 'sportsPreferences'].map((tab) => (
                   <button
                     key={tab}
                     type="button"
@@ -329,6 +386,122 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                             <button
                               type="button"
                               onClick={() => handleRemoveSkill(skill)}
+                              className="ml-2 text-indigo-400 hover:text-indigo-600"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'sportsPreferences' && (
+                    <div className="space-y-4">
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={sportInput}
+                          onChange={(e) => setSportInput(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="Add a sport"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddIndoorSport}
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                          Add Indoor Sport
+                        </button>
+                      </div>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={sportInput}
+                          onChange={(e) => setSportInput(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="Add a sport"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddOutdoorSport}
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                          Add Outdoor Sport
+                        </button>
+                      </div>
+                      <div>
+                        <label>Skill Level</label>
+                        <select
+                          value={formData.sportsPreferences.skillLevel}
+                          onChange={(e) => handleSportsChange('skillLevel', e.target.value)}
+                          className="form-select"
+                        >
+                          <option value="">Select Skill Level</option>
+                          <option value="beginner">Beginner</option>
+                          <option value="intermediate">Intermediate</option>
+                          <option value="advanced">Advanced</option>
+                        </select>
+                      </div>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={locationInput}
+                          onChange={(e) => setLocationInput(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="Add a location"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddLocation}
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                          Add Location
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {formData.sportsPreferences.preferredLocations.map((location, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm flex items-center"
+                          >
+                            {location}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveLocation(location)}
+                              className="ml-2 text-indigo-400 hover:text-indigo-600"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={availabilityInput}
+                          onChange={(e) => setAvailabilityInput(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="Add availability"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddAvailability}
+                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                          Add Availability
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {formData.sportsPreferences.availability.map((time, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm flex items-center"
+                          >
+                            {time}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveAvailability(time)}
                               className="ml-2 text-indigo-400 hover:text-indigo-600"
                             >
                               ×
