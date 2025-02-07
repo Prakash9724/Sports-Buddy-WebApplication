@@ -53,30 +53,22 @@ const Dashboard = () => {
           return;
         }
 
-        // Set initial user data from localStorage
+        // Set initial data from localStorage
         if (userData) {
           setUser(JSON.parse(userData));
         }
 
-        // Fetch latest user data
-        const profileResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
+        // Fetch latest data
+        const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/profile', {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${token}`
           }
         });
 
-        if (profileResponse.status === 401) {
-          localStorage.removeItem('userToken');
-          localStorage.removeItem('userData');
-          navigate('/login');
-          return;
-        }
-
-        const profileData = await profileResponse.json();
-        
-        if (profileData.success) {
-          setUser(profileData.user);
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.user);
+          localStorage.setItem('userData', JSON.stringify(data.user));
           
           // Fetch registered events
           const eventsResponse = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/registered-events', {
@@ -91,10 +83,10 @@ const Dashboard = () => {
             setRegisteredEvents(eventsData.events);
           }
         } else {
-          toast.error(profileData.message);
+          toast.error(data.message);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching user data:', error);
         toast.error('Failed to load dashboard');
       } finally {
         setLoading(false);
@@ -105,10 +97,10 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleProfileUpdate = (updatedUser) => {
-    console.log('Updating user in dashboard:', updatedUser); // Debug log
-    setUser(updatedUser);
+    console.log('Received updated user:', updatedUser); // Debug log
     
-    // Also update userData in localStorage
+    // Update both state and localStorage
+    setUser(updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser));
   };
 
