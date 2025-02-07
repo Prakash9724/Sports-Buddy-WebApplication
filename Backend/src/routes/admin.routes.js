@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { isAuthenticated, isAdmin } = require('../middleware/auth.middleware');
 const { upload } = require('../middleware/multer');
@@ -21,22 +22,23 @@ const Event = require('../models/event.model');
 router.post('/login', async (req, res) => {
     try {
         const { email, password, secretKey } = req.body;
+        console.log('Admin login attempt:', { email }); // Debug log
 
-        // Check admin credentials
+        // Check admin credentials from env
         if (email !== process.env.ADMIN_EMAIL || 
             password !== process.env.ADMIN_PASSWORD || 
             secretKey !== process.env.ADMIN_SECRET_KEY) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid admin credentials"
+                message: 'Invalid admin credentials'
             });
         }
 
-        // Generate token with admin role
+        // Generate admin token
         const token = jwt.sign(
             { 
-                role: 'admin',
-                email: process.env.ADMIN_EMAIL
+                email,
+                role: 'admin'
             },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
@@ -44,16 +46,15 @@ router.post('/login', async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "Admin login successful",
-            token,
-            tokenKey: 'adminToken'
+            message: 'Admin login successful',
+            token
         });
 
     } catch (error) {
-        console.error("Admin login error:", error);
+        console.error('Admin login error:', error);
         res.status(500).json({
             success: false,
-            message: "Login failed"
+            message: 'Admin login failed'
         });
     }
 });
