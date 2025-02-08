@@ -192,11 +192,12 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
             {/* Tabs - Visible on all screens */}
             <div className="border-b border-gray-200">
               <div className="flex space-x-8 px-6">
-                {['personal', 'professional', 'skills', 'sportsPreferences'].map((tab) => (
+                {['personal', 'professional', 'skills'].map((tab) => (
                   <button
                     key={tab}
                     type="button"
                     className={`py-4 px-1 relative ${
+
                       activeTab === tab
                         ? 'text-indigo-600 font-medium'
                         : 'text-gray-500 hover:text-gray-700'
@@ -218,100 +219,110 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                 {/* Tab Content */}
                 <div className="space-y-6">
                   {activeTab === 'personal' && (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label>First Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                         <input
                           type="text"
                           value={formData.personal.firstName}
                           onChange={(e) => handleChange('personal', 'firstName', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       <div>
-                        <label>Last Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                         <input
                           type="text"
                           value={formData.personal.lastName}
                           onChange={(e) => handleChange('personal', 'lastName', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         />
                       </div>
                       <div>
-                        <label>Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input
                           type="email"
                           value={formData.personal.email}
                           onChange={(e) => handleChange('personal', 'email', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         />
                       </div>
                       <div>
-                        <label>Phone Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
                           type="tel"
                           value={formData.personal.phone}
                           onChange={(e) => handleChange('personal', 'phone', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       <div>
-                        <label>Gender</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                         <select
                           value={formData.personal.gender}
                           onChange={(e) => handleChange('personal', 'gender', e.target.value)}
-                          className="form-select"
+                          className="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         >
                           <option value="">Select Gender</option>
                           <option value="male">Male</option>
                           <option value="female">Female</option>
                           <option value="other">Other</option>
+
                         </select>
                       </div>
                       <div>
-                        <label>Date of Birth</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                         <input
                           type="date"
                           value={formData.personal.dateOfBirth}
                           onChange={(e) => handleChange('personal', 'dateOfBirth', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                           max={new Date().toISOString().split('T')[0]}
                         />
                       </div>
                       <div>
-                        <label>Address</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                         <input
                           type="text"
                           value={formData.personal.address}
                           onChange={(e) => handleChange('personal', 'address', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         />
                       </div>
                       <div>
-                        <label>City</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                         <input
                           type="text"
                           value={formData.personal.city}
                           onChange={(e) => handleChange('personal', 'city', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
+
                         />
                       </div>
                       <div>
-                        <label>State</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                         <input
                           type="text"
                           value={formData.personal.state}
                           onChange={(e) => handleChange('personal', 'state', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         />
                       </div>
                       <div>
-                        <label>Pincode</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
                         <input
                           type="text"
                           value={formData.personal.pincode}
                           onChange={(e) => handleChange('personal', 'pincode', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
+
                         />
                       </div>
                     </div>
@@ -320,39 +331,45 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                   {activeTab === 'professional' && (
                     <div className="space-y-4">
                       <div>
-                        <label>Occupation</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
                         <input
                           type="text"
                           value={formData.professional.occupation}
                           onChange={(e) => handleChange('professional', 'occupation', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                       </div>
                       <div>
-                        <label>Company</label>
+
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
                         <input
                           type="text"
                           value={formData.professional.company}
                           onChange={(e) => handleChange('professional', 'company', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
+
                         />
                       </div>
                       <div>
-                        <label>Experience</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
                         <input
                           type="text"
                           value={formData.professional.experience}
                           onChange={(e) => handleChange('professional', 'experience', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                         
+
                         />
                       </div>
                       <div>
-                        <label>Education</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Education</label>
                         <input
                           type="text"
                           value={formData.professional.education}
                           onChange={(e) => handleChange('professional', 'education', e.target.value)}
-                          className="form-input"
+                          className="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+
                         />
                       </div>
                     </div>
@@ -396,121 +413,7 @@ const UserProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                     </div>
                   )}
 
-                  {activeTab === 'sportsPreferences' && (
-                    <div className="space-y-4">
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={sportInput}
-                          onChange={(e) => setSportInput(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Add a sport"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddIndoorSport}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                        >
-                          Add Indoor Sport
-                        </button>
-                      </div>
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={sportInput}
-                          onChange={(e) => setSportInput(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Add a sport"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddOutdoorSport}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                        >
-                          Add Outdoor Sport
-                        </button>
-                      </div>
-                      <div>
-                        <label>Skill Level</label>
-                        <select
-                          value={formData.sportsPreferences.skillLevel}
-                          onChange={(e) => handleSportsChange('skillLevel', e.target.value)}
-                          className="form-select"
-                        >
-                          <option value="">Select Skill Level</option>
-                          <option value="beginner">Beginner</option>
-                          <option value="intermediate">Intermediate</option>
-                          <option value="advanced">Advanced</option>
-                        </select>
-                      </div>
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={locationInput}
-                          onChange={(e) => setLocationInput(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Add a location"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddLocation}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                        >
-                          Add Location
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.sportsPreferences.preferredLocations.map((location, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm flex items-center"
-                          >
-                            {location}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveLocation(location)}
-                              className="ml-2 text-indigo-400 hover:text-indigo-600"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={availabilityInput}
-                          onChange={(e) => setAvailabilityInput(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="Add availability"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddAvailability}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                        >
-                          Add Availability
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.sportsPreferences.availability.map((time, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm flex items-center"
-                          >
-                            {time}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveAvailability(time)}
-                              className="ml-2 text-indigo-400 hover:text-indigo-600"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                 
                 </div>
 
                 {/* Action Buttons */}
