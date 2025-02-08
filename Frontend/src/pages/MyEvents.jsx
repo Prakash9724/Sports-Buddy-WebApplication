@@ -68,7 +68,7 @@ const MyEvents = () => {
                 {/* Event Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
+                    src={`${event.image}`}
                     alt={event.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

@@ -55,13 +55,12 @@ const EventInfo = () => {
         return;
       }
 
-      const response = await fetch('https://sports-buddy-webapplication.onrender.com/api/users/register-event', {
-        method: 'PUT',
+      const response = await fetch(`https://sports-buddy-webapplication.onrender.com/api/events/${id}/register`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ eventId: id })
+        }
       });
 
       const data = await response.json();
@@ -69,13 +68,23 @@ const EventInfo = () => {
       if (data.success) {
         toast.success('Event registration successful!');
         setIsRegistered(true);
-        // Update participants count
         setEvent(prev => ({
           ...prev,
           currentParticipants: (prev.currentParticipants || 0) + 1
         }));
       } else {
-        toast.error(data.message || 'Registration failed');
+        if (data.isRegistered) {
+          toast('Aap is event ke liye already registered ho! 🎯', {
+            icon: '🏃‍♂️',
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+            },
+          });
+        } else {
+          toast.error(data.message || 'Registration failed');
+        }
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -118,7 +127,7 @@ const EventInfo = () => {
               {/* Event Image */}
               <div className="relative h-[400px] rounded-xl overflow-hidden mb-6">
                 <img
-                  src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
+                  src={event.image}
                   alt={event.title}
                   className="w-full h-full object-cover"
                 />

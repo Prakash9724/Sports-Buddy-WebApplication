@@ -154,7 +154,7 @@ const AdminEventsList = () => {
               <div key={event._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="relative h-48">
                   <img
-                    src={`https://sports-buddy-webapplication.onrender.com${event.image}`}
+                    src={`${event.image}`}
                     alt={event.title}
                     className="w-full h-full object-cover"
                   />

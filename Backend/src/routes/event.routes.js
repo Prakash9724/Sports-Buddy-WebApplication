@@ -38,11 +38,31 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id);
+    const user = await User.findById(req.user._id);
     
+    // Check if event exists
     if (!event) {
       return res.status(404).json({
         success: false,
         message: 'Event nahi mila'
+      });
+    }
+
+    // Check if user is already registered
+    const isAlreadyRegistered = event.participants.includes(user._id);
+    if (isAlreadyRegistered) {
+      return res.status(400).json({
+        success: false,
+        message: 'Aap is event ke liye already registered ho!',
+        isRegistered: true
+      });
+    }
+
+    // First check if user is admin
+    if (req.user.role === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin cannot register for events'
       });
     }
 
@@ -54,32 +74,11 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       });
     }
 
-    // Get user ID from token
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
     // Check if event is full
     if (event.currentParticipants >= event.maxParticipants) {
       return res.status(400).json({
         success: false,
         message: 'Event full ho gaya hai'
-      });
-    }
-
-    // Check if user is already registered
-    const isRegistered = event.participants.some(participantId => 
-      participantId.toString() === user._id.toString()
-    );
-
-    if (isRegistered) {
-      return res.status(400).json({
-        success: false,
-        message: 'Aap pehle se registered ho'
       });
     }
 
@@ -100,11 +99,10 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       event: event
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
-      message: 'Registration mein error aaya',
-      error: error.message
+      message: 'Registration mein error aaya'
     });
   }
 });
