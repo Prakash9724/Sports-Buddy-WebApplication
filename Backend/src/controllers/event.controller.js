@@ -1,4 +1,12 @@
 const Event = require('../models/event.model');
+const cloudinary = require('cloudinary').v2;
+
+// Cloudinary configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 exports.getAllEvents = async (req, res) => {
   try {
@@ -37,9 +45,16 @@ exports.createEvent = async (req, res) => {
   try {
     const eventData = req.body;
     
-    // Handle image upload if present
+    // Handle image upload to cloudinary if file exists
     if (req.file) {
-      eventData.image = `/uploads/${req.file.filename}`;
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'sports-buddy/events',
+        width: 1000,
+        crop: "scale"
+      });
+
+      // Add cloudinary image url to event data
+      eventData.image = result.secure_url;
     }
 
     // Add organizer
@@ -61,10 +76,11 @@ exports.createEvent = async (req, res) => {
       event
     });
   } catch (error) {
-    console.error('Error creating event:', error);
+    console.error('Event creation error:', error);
     res.status(500).json({
       success: false,
-      message: 'Event create karne mein error aaya'
+      message: 'Event create karne mein error aaya',
+      error: error.message
     });
   }
 };
@@ -74,9 +90,16 @@ exports.updateEvent = async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
 
-    // Handle image upload if present
+    // Handle image upload to cloudinary if new file
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'sports-buddy/events',
+        width: 1000,
+        crop: "scale"
+      });
+
+      // Add cloudinary image url to event data
+      updateData.image = result.secure_url;
     }
 
     // Remove participants field if it's empty or invalid
@@ -119,10 +142,11 @@ exports.updateEvent = async (req, res) => {
       event
     });
   } catch (error) {
-    console.error('Error updating event:', error);
+    console.error('Event update error:', error);
     res.status(500).json({
       success: false,
-      message: 'Event update karne mein error aaya'
+      message: 'Event update karne mein error aaya',
+      error: error.message
     });
   }
 };
