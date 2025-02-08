@@ -38,9 +38,6 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id);
-    const user = await User.findById(req.user._id);
-    
-    // Check if event exists
     if (!event) {
       return res.status(404).json({
         success: false,
@@ -48,21 +45,24 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       });
     }
 
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
     // Check if user is already registered
-    const isAlreadyRegistered = event.participants.includes(user._id);
+    const isAlreadyRegistered = event.participants && event.participants.some(
+      participantId => participantId.toString() === user._id.toString()
+    );
+
     if (isAlreadyRegistered) {
       return res.status(400).json({
         success: false,
         message: 'Aap is event ke liye already registered ho!',
         isRegistered: true
-      });
-    }
-
-    // First check if user is admin
-    if (req.user.role === 'admin') {
-      return res.status(400).json({
-        success: false,
-        message: 'Admin cannot register for events'
       });
     }
 
@@ -82,12 +82,22 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       });
     }
 
+    // Initialize participants array if it doesn't exist
+    if (!event.participants) {
+      event.participants = [];
+    }
+
     // Add user to event participants
     event.participants.push(user._id);
     event.currentParticipants = event.participants.length;
     await event.save();
 
-    // Add event to user's registered events if not already added
+    // Initialize registeredEvents array if it doesn't exist
+    if (!user.registeredEvents) {
+      user.registeredEvents = [];
+    }
+
+    // Add event to user's registered events
     if (!user.registeredEvents.includes(event._id)) {
       user.registeredEvents.push(event._id);
       await user.save();
@@ -98,6 +108,7 @@ router.post('/:id/register', isAuthenticated, async (req, res) => {
       message: 'Registration successful ho gaya',
       event: event
     });
+
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({
