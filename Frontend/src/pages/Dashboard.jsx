@@ -306,13 +306,14 @@ const Dashboard = () => {
                     <img 
                       src={event.image}
                       alt={event.title}
+
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2 right-2 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm">
                       {event.sport}
                     </div>
                   </div>
-                  <div className="p-4">
+                  <div className="p-4 ">
                     <h3 className="font-semibold text-lg text-gray-900 mb-2">{event.title}</h3>
                     <div className="flex items-center text-gray-600 text-sm">
                       <Calendar className="h-4 w-4 mr-2" />
